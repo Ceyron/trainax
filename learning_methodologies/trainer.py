@@ -20,11 +20,11 @@ class Trainer(eqx.Module):
     def __init__(
         self,
         mixer: TrajectoryMixer,
-        loss_configuration: LossConfiguration = Supervised(),
+        loss_configuration: LossConfiguration,
         *,
         ref_stepper: eqx.Module = None,
         residuum_fn: eqx.Module = None,
-        optimizer: optax.GradientTransformation = optax.adam(1e-3),
+        optimizer: optax.GradientTransformation,
         callback_fn = None,
     ):
         self.mixer = mixer

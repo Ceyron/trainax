@@ -10,3 +10,8 @@ from .time_level_loss import (
 )
 from .mixer import TrajectoryMixer
 from .trainer import Trainer
+from .sample_trainer import (
+    DivertedChainBranchOneTrainer,
+    ResiduumTrainer,
+    SupervisedTrainer,
+)
