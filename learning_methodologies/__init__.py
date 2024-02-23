@@ -8,7 +8,7 @@ from .loss_configuration import (
 from .time_level_loss import (
     L2Loss,
 )
-from .mixer import TrajectoryMixer
+from .mixer import TrajectorySubStacker, PermutationMixer
 from .trainer import Trainer
 from .sample_trainer import (
     DivertedChainBranchOneTrainer,
