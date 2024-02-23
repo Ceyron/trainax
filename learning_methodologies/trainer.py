@@ -4,34 +4,40 @@ import equinox as eqx
 import optax
 from tqdm.autonotebook import tqdm
 
-from jaxtyping import PyTree, Float, Array
+from jaxtyping import PyTree, Float, Array, PRNGKeyArray
 
-from .mixer import TrajectoryMixer
+from .mixer import TrajectorySubStacker, PermutationMixer
 from .loss_configuration import LossConfiguration, Supervised
 
 class Trainer(eqx.Module):
-    mixer: TrajectoryMixer
+    trajectory_sub_stacker: TrajectorySubStacker
     loss_configuration: LossConfiguration
     ref_stepper: eqx.Module
     residuum_fn: eqx.Module
     optimizer: optax.GradientTransformation
+    num_minibatches: int
+    batch_size: int
     callback_fn: eqx.Module
 
     def __init__(
         self,
-        mixer: TrajectoryMixer,
+        trajectory_sub_stacker: TrajectorySubStacker,
         loss_configuration: LossConfiguration,
         *,
         ref_stepper: eqx.Module = None,
         residuum_fn: eqx.Module = None,
         optimizer: optax.GradientTransformation,
+        num_minibatches: int,
+        batch_size: int,
         callback_fn = None,
     ):
-        self.mixer = mixer
+        self.trajectory_sub_stacker = trajectory_sub_stacker
         self.loss_configuration = loss_configuration
         self.ref_stepper = ref_stepper
         self.residuum_fn = residuum_fn
         self.optimizer = optimizer
+        self.num_minibatches = num_minibatches
+        self.batch_size = batch_size
         self.callback_fn = callback_fn
     
     def step_fn(
@@ -52,6 +58,7 @@ class Trainer(eqx.Module):
     def __call__(
         self,
         stepper: eqx.Module,
+        key: PRNGKeyArray,
         *,
         return_loss_history: bool = True,
     ):
@@ -59,8 +66,15 @@ class Trainer(eqx.Module):
         if self.callback_fn is not None:
             aux_history = []
 
+        mixer = PermutationMixer(
+            num_total_samples=self.trajectory_sub_stacker.num_total_samples,
+            num_minibatches=self.num_minibatches,
+            batch_size=self.batch_size,
+            shuffle_key=key,
+        )
+
         p_meter = tqdm(
-            total=self.mixer.num_minibatches,
+            total=self.num_minibatches,
             desc=f"E: {0:05d}, B: {0:05d}",
         )
 
@@ -69,8 +83,9 @@ class Trainer(eqx.Module):
         trained_stepper = stepper
         opt_state = self.optimizer.init(eqx.filter(trained_stepper, eqx.is_array))
 
-        for update_i in range(self.mixer.num_minibatches):
-            data, (expoch_id, batch_id) = self.mixer(update_i, return_info=True)
+        for update_i in range(self.num_minibatches):
+            batch_indices, (expoch_id, batch_id) = mixer(update_i, return_info=True)
+            data = self.trajectory_sub_stacker(batch_indices)
             if self.callback_fn is not None:
                 aux = self.callback_fn(update_i, trained_stepper, data)
                 aux_history.append(aux)
