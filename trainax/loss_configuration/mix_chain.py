@@ -34,7 +34,7 @@ class MixChainPostPhysics(LossConfiguration):
         self.time_level_loss = time_level_loss
         self.cut_bptt = cut_bptt
         self.cut_bptt_every = cut_bptt_every
-        if self.time_level_weights is None:
+        if time_level_weights is None:
             self.time_level_weights = [1.0,] * (self.num_rollout_steps + self.num_post_physics_steps)
         else:
             self.time_level_weights = time_level_weights

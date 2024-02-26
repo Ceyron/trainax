@@ -34,7 +34,7 @@ class DivertedChainBranchOne(LossConfiguration):
         self.cut_bptt = cut_bptt
         self.cut_bptt_every = cut_bptt_every
         self.cut_div_chain = cut_div_chain
-        if self.time_level_weights is None:
+        if time_level_weights is None:
             self.time_level_weights = [1.0,] * self.num_rollout_steps
         else:
             self.time_level_weights = time_level_weights
