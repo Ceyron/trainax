@@ -4,8 +4,8 @@ import optax
 from jaxtyping import PRNGKeyArray
 from tqdm.autonotebook import tqdm
 
+from ._mixer import PermutationMixer, TrajectorySubStacker
 from .configuration import BaseConfiguration
-from .mixer import PermutationMixer, TrajectorySubStacker
 
 
 class GeneralTrainer(eqx.Module):

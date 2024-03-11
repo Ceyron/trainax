@@ -1,6 +1,6 @@
 from equinox import Module
 
-from .base_configuration import BaseConfiguration
+from ._base_configuration import BaseConfiguration
 
 
 class CompositeLossConfiguratoin(BaseConfiguration):

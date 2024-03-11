@@ -1,18 +1,18 @@
 import equinox as eqx
 
-from ..configuration import Residuum
-from ..general_trainer import GeneralTrainer
+from .._general_trainer import GeneralTrainer
+from .._mixer import TrajectorySubStacker
+from ..configuration import Supervised
 from ..loss import BaseLoss, L2Loss
-from ..mixer import TrajectorySubStacker
 
 
-class ResiduumTrainer(GeneralTrainer):
+class SupervisedTrainer(GeneralTrainer):
     def __init__(
         self,
         data_trajectories,
         *,
         ref_stepper: eqx.Module = None,  # for compatibility
-        residuum_fn: eqx.Module,
+        residuum_fn: eqx.Module = None,  # for compatibility
         optimizer,
         callback_fn=None,
         num_training_steps: int,
@@ -21,8 +21,6 @@ class ResiduumTrainer(GeneralTrainer):
         time_level_loss: BaseLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
-        cut_prev: bool = False,
-        cut_next: bool = False,
         time_level_weights: list[float] = None,
         do_sub_stacking: bool = True,
     ):
@@ -32,13 +30,11 @@ class ResiduumTrainer(GeneralTrainer):
             do_sub_stacking=do_sub_stacking,
             only_store_ic=False,
         )
-        loss_configuration = Residuum(
+        loss_configuration = Supervised(
             num_rollout_steps=num_rollout_steps,
             time_level_loss=time_level_loss,
             cut_bptt=cut_bptt,
             cut_bptt_every=cut_bptt_every,
-            cut_prev=cut_prev,
-            cut_next=cut_next,
             time_level_weights=time_level_weights,
         )
         super().__init__(

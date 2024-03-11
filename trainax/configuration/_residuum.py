@@ -4,17 +4,18 @@ import equinox as eqx
 import jax
 from jaxtyping import Array, Float, PyTree
 
+from .._utils import extract_ic_and_trj
 from ..loss import BaseLoss, L2Loss
-from ..utils import extract_ic_and_trj
-from .base_configuration import BaseConfiguration
+from ._base_configuration import BaseConfiguration
 
 
-class DivertedChainBranchOne(BaseConfiguration):
+class Residuum(BaseConfiguration):
     num_rollout_steps: int
     time_level_loss: BaseLoss
     cut_bptt: bool
     cut_bptt_every: int
-    cut_div_chain: bool
+    cut_prev: bool
+    cut_next: bool
     time_level_weights: list[float]
 
     def __init__(
@@ -24,14 +25,16 @@ class DivertedChainBranchOne(BaseConfiguration):
         time_level_loss: BaseLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
-        cut_div_chain: bool = False,
+        cut_prev: bool = False,
+        cut_next: bool = False,
         time_level_weights: Optional[list[float]] = None,
     ):
         self.num_rollout_steps = num_rollout_steps
         self.time_level_loss = time_level_loss
         self.cut_bptt = cut_bptt
         self.cut_bptt_every = cut_bptt_every
-        self.cut_div_chain = cut_div_chain
+        self.cut_prev = cut_prev
+        self.cut_next = cut_next
         if time_level_weights is None:
             self.time_level_weights = [
                 1.0,
@@ -44,24 +47,33 @@ class DivertedChainBranchOne(BaseConfiguration):
         stepper: eqx.Module,
         data: PyTree[Float[Array, "batch num_snapshots ..."]],
         *,
-        ref_stepper: eqx.Module,
+        ref_stepper: eqx.Module = None,  # unused
         residuum_fn: eqx.Module = None,  # unused
     ) -> float:
         # Data is supposed to contain the initial condition, trj is not used
         ic, _ = extract_ic_and_trj(data)
 
-        pred = ic
+        pred_prev = ic
         loss = 0.0
 
         for t in range(self.num_rollout_steps):
-            ref = jax.vmap(ref_stepper)(pred)
-            if self.cut_div_chain:
-                ref = jax.lax.stop_gradient(ref)
-            pred = jax.vmap(stepper)(pred)
-            loss += self.time_level_weights[t] * self.time_level_loss(pred, ref)
+            pred_next = jax.vmap(stepper)(pred_prev)
+            if self.cut_prev:
+                pred_prev_mod = jax.lax.stop_gradient(pred_prev)
+            else:
+                pred_prev_mod = pred_prev
+            if self.cut_next:
+                pred_next_mod = jax.lax.stop_gradient(pred_next)
+            else:
+                pred_next_mod = pred_next
 
-            if self.cut_bptt:
-                if (t + 1) % self.cut_bptt_every == 0:
-                    pred = jax.lax.stop_gradient(pred)
+            loss += self.time_level_weights[t] * self.time_level_loss(
+                residuum_fn(pred_next_mod, pred_prev_mod)
+            )
+
+            if self.cut_bptt and (t + 1) % self.cut_bptt_every == 0:
+                pred_prev = jax.lax.stop_gradient(pred_next)
+            else:
+                pred_prev = pred_next
 
         return loss

@@ -1,6 +1,6 @@
 from . import configuration, loss, trainer
-from .general_trainer import GeneralTrainer
-from .mixer import PermutationMixer, TrajectorySubStacker
+from ._general_trainer import GeneralTrainer
+from ._mixer import PermutationMixer, TrajectorySubStacker
 
 __all__ = [
     "configuration",

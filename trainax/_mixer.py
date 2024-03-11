@@ -4,7 +4,7 @@ import jax.numpy as jnp
 import jax.tree_util as jtu
 from jaxtyping import Array, Float, PRNGKeyArray, PyTree
 
-from .utils import stack_sub_trajectories
+from ._utils import stack_sub_trajectories
 
 
 class TrajectorySubStacker(eqx.Module):

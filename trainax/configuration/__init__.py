@@ -4,12 +4,12 @@ neural operator.
 """
 
 
-from .base_configuration import BaseConfiguration
-from .composite import CompositeLossConfiguratoin
-from .diverted_chain import DivertedChainBranchOne
-from .mix_chain import MixChainPostPhysics
-from .residuum import Residuum
-from .supervised import Supervised
+from ._base_configuration import BaseConfiguration
+from ._composite import CompositeLossConfiguratoin
+from ._diverted_chain import DivertedChainBranchOne
+from ._mix_chain import MixChainPostPhysics
+from ._residuum import Residuum
+from ._supervised import Supervised
 
 __all__ = [
     "BaseConfiguration",

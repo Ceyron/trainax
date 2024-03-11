@@ -1,17 +1,17 @@
 import equinox as eqx
 
-from ..configuration import Supervised
-from ..general_trainer import GeneralTrainer
+from .._general_trainer import GeneralTrainer
+from .._mixer import TrajectorySubStacker
+from ..configuration import DivertedChainBranchOne
 from ..loss import BaseLoss, L2Loss
-from ..mixer import TrajectorySubStacker
 
 
-class SupervisedTrainer(GeneralTrainer):
+class DivertedChainBranchOneTrainer(GeneralTrainer):
     def __init__(
         self,
         data_trajectories,
         *,
-        ref_stepper: eqx.Module = None,  # for compatibility
+        ref_stepper: eqx.Module,
         residuum_fn: eqx.Module = None,  # for compatibility
         optimizer,
         callback_fn=None,
@@ -21,6 +21,7 @@ class SupervisedTrainer(GeneralTrainer):
         time_level_loss: BaseLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
+        cut_div_chain: bool = False,
         time_level_weights: list[float] = None,
         do_sub_stacking: bool = True,
     ):
@@ -28,13 +29,14 @@ class SupervisedTrainer(GeneralTrainer):
             data_trajectories,
             sub_trajectory_len=num_rollout_steps + 1,  # +1 for the IC
             do_sub_stacking=do_sub_stacking,
-            only_store_ic=False,
+            only_store_ic=True,  # Not needed because we use the ref_stepper
         )
-        loss_configuration = Supervised(
+        loss_configuration = DivertedChainBranchOne(
             num_rollout_steps=num_rollout_steps,
             time_level_loss=time_level_loss,
             cut_bptt=cut_bptt,
             cut_bptt_every=cut_bptt_every,
+            cut_div_chain=cut_div_chain,
             time_level_weights=time_level_weights,
         )
         super().__init__(

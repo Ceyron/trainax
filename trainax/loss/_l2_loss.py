@@ -1,7 +1,7 @@
 import jax.numpy as jnp
 from jaxtyping import Array
 
-from .base_loss import BaseLoss
+from ._base_loss import BaseLoss
 
 
 class L2Loss(BaseLoss):

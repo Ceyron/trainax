@@ -4,9 +4,9 @@ minibatching.
 """
 
 
-from .diverted_chain import DivertedChainBranchOneTrainer
-from .residuum import ResiduumTrainer
-from .supervised import SupervisedTrainer
+from ._diverted_chain import DivertedChainBranchOneTrainer
+from ._residuum import ResiduumTrainer
+from ._supervised import SupervisedTrainer
 
 __all__ = [
     "DivertedChainBranchOneTrainer",
