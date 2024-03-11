@@ -1,18 +1,18 @@
 import equinox as eqx
 
-from ..loss_configuration import Residuum
+from ..configuration import DivertedChainBranchOne
+from ..general_trainer import GeneralTrainer
+from ..loss import L2Loss, TimeLevelLoss
 from ..mixer import TrajectorySubStacker
-from ..time_level_loss import L2Loss, TimeLevelLoss
-from ..trainer import Trainer
 
 
-class ResiduumTrainer(Trainer):
+class DivertedChainBranchOneTrainer(GeneralTrainer):
     def __init__(
         self,
         data_trajectories,
         *,
-        ref_stepper: eqx.Module = None,  # for compatibility
-        residuum_fn: eqx.Module,
+        ref_stepper: eqx.Module,
+        residuum_fn: eqx.Module = None,  # for compatibility
         optimizer,
         callback_fn=None,
         num_training_steps: int,
@@ -21,8 +21,7 @@ class ResiduumTrainer(Trainer):
         time_level_loss: TimeLevelLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
-        cut_prev: bool = False,
-        cut_next: bool = False,
+        cut_div_chain: bool = False,
         time_level_weights: list[float] = None,
         do_sub_stacking: bool = True,
     ):
@@ -30,15 +29,14 @@ class ResiduumTrainer(Trainer):
             data_trajectories,
             sub_trajectory_len=num_rollout_steps + 1,  # +1 for the IC
             do_sub_stacking=do_sub_stacking,
-            only_store_ic=False,
+            only_store_ic=True,  # Not needed because we use the ref_stepper
         )
-        loss_configuration = Residuum(
+        loss_configuration = DivertedChainBranchOne(
             num_rollout_steps=num_rollout_steps,
             time_level_loss=time_level_loss,
             cut_bptt=cut_bptt,
             cut_bptt_every=cut_bptt_every,
-            cut_prev=cut_prev,
-            cut_next=cut_next,
+            cut_div_chain=cut_div_chain,
             time_level_weights=time_level_weights,
         )
         super().__init__(

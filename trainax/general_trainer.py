@@ -4,11 +4,11 @@ import optax
 from jaxtyping import PRNGKeyArray
 from tqdm.autonotebook import tqdm
 
-from .loss_configuration import LossConfiguration
+from .configuration import LossConfiguration
 from .mixer import PermutationMixer, TrajectorySubStacker
 
 
-class Trainer(eqx.Module):
+class GeneralTrainer(eqx.Module):
     trajectory_sub_stacker: TrajectorySubStacker
     loss_configuration: LossConfiguration
     ref_stepper: eqx.Module

@@ -4,7 +4,7 @@ import equinox as eqx
 import jax
 from jaxtyping import Array, Float, PyTree
 
-from ..time_level_loss import L2Loss, TimeLevelLoss
+from ..loss import L2Loss, TimeLevelLoss
 from ..utils import extract_ic_and_trj
 from .base_loss_configuration import LossConfiguration
 

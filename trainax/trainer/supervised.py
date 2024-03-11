@@ -1,12 +1,12 @@
 import equinox as eqx
 
-from ..loss_configuration import Supervised
+from ..configuration import Supervised
+from ..general_trainer import GeneralTrainer
+from ..loss import L2Loss, TimeLevelLoss
 from ..mixer import TrajectorySubStacker
-from ..time_level_loss import L2Loss, TimeLevelLoss
-from ..trainer import Trainer
 
 
-class SupervisedTrainer(Trainer):
+class SupervisedTrainer(GeneralTrainer):
     def __init__(
         self,
         data_trajectories,
