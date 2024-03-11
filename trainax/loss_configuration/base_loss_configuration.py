@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
+
 import equinox as eqx
 
-from ..time_level_loss import TimeLevelLoss
 
 class LossConfiguration(eqx.Module, ABC):
     @abstractmethod

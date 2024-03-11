@@ -1,12 +1,11 @@
+import equinox as eqx
 import jax
 import jax.numpy as jnp
 import jax.tree_util as jtu
-
-from jaxtyping import Array, Float, PyTree, PRNGKeyArray, Int
-
-import equinox as eqx
+from jaxtyping import Array, Float, PRNGKeyArray, PyTree
 
 from .utils import stack_sub_trajectories
+
 
 class TrajectorySubStacker(eqx.Module):
     data_sub_trajectories: PyTree[Float[Array, "num_total_samples sub_trj_len ..."]]
@@ -29,7 +28,9 @@ class TrajectorySubStacker(eqx.Module):
             )(data_trajectories, sub_trajectory_len)
         else:
             # shape is (num_samples, 1, sub_trj_len, ...)
-            stacked_sub_trajectories = jtu.tree_map(lambda x: x[:, None, :sub_trajectory_len], data_trajectories)
+            stacked_sub_trajectories = jtu.tree_map(
+                lambda x: x[:, None, :sub_trajectory_len], data_trajectories
+            )
 
         # Merge the two batch axes (num_samples & num_stacks) into (num_total_samples)
         # resulting shape is (num_total_samples, sub_trj_len, ...)
@@ -50,6 +51,7 @@ class TrajectorySubStacker(eqx.Module):
     ):
         return jtu.tree_map(lambda x: x[indices], self.data_sub_trajectories)
 
+
 class PermutationMixer(eqx.Module):
     num_total_samples: int
     num_minibatches: int
@@ -67,7 +69,9 @@ class PermutationMixer(eqx.Module):
         shuffle_key: PRNGKeyArray,
     ):
         if num_total_samples < batch_size:
-            print(f"batch size {batch_size} is larger than the total number of samples {num_total_samples}")
+            print(
+                f"batch size {batch_size} is larger than the total number of samples {num_total_samples}"
+            )
             print("Performing full batch training")
             effective_batch_size = num_total_samples
         else:
@@ -75,13 +79,20 @@ class PermutationMixer(eqx.Module):
 
         self.num_total_samples = num_total_samples
         self.num_minibatches = num_minibatches
-        self.num_minibatches_per_epoch = int(jnp.ceil(num_total_samples / effective_batch_size))
-        self.num_epochs = int(jnp.ceil(num_minibatches / self.num_minibatches_per_epoch))
+        self.num_minibatches_per_epoch = int(
+            jnp.ceil(num_total_samples / effective_batch_size)
+        )
+        self.num_epochs = int(
+            jnp.ceil(num_minibatches / self.num_minibatches_per_epoch)
+        )
         self.batch_size = effective_batch_size
 
         # Precompute the permutations
         _, self.permutations = jax.lax.scan(
-            lambda key, _: (jax.random.split(key)[0], jax.random.permutation(key, num_total_samples)),
+            lambda key, _: (
+                jax.random.split(key)[0],
+                jax.random.permutation(key, num_total_samples),
+            ),
             shuffle_key,
             None,
             length=self.num_epochs,
@@ -112,10 +123,12 @@ class PermutationMixer(eqx.Module):
         else:
             return batch_indices
 
+
 class TrajectoryMixer(eqx.Module):
     """
     Convenience class to combine `TrajectorySubStacker` and `PermutationMixer`
     """
+
     trajectory_sub_stacker: TrajectorySubStacker
     permutation_mixer: PermutationMixer
 
@@ -130,7 +143,9 @@ class TrajectoryMixer(eqx.Module):
         do_sub_stacking: bool = True,
         only_store_ic: bool = False,
     ):
-        print("Please prefer using the `TrajectorySubStacker` and `PermutationMixer` directly")
+        print(
+            "Please prefer using the `TrajectorySubStacker` and `PermutationMixer` directly"
+        )
         self.trajectory_sub_stacker = TrajectorySubStacker(
             data_trajectories,
             sub_trajectory_len,
@@ -152,7 +167,9 @@ class TrajectoryMixer(eqx.Module):
         return_info: bool = False,
     ):
         if return_info:
-            batch_indices, permutation_info = self.permutation_mixer(i, return_info=True)
+            batch_indices, permutation_info = self.permutation_mixer(
+                i, return_info=True
+            )
             return self.trajectory_sub_stacker(batch_indices), permutation_info
         else:
             batch_indices = self.permutation_mixer(i)

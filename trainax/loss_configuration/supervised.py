@@ -1,15 +1,13 @@
-import jax
+from typing import Optional
 
-from typing import Optional, Union
-from abc import ABC, abstractmethod
 import equinox as eqx
+import jax
+from jaxtyping import Array, Float, PyTree
 
-from jaxtyping import Float, Array, PyTree
-
-from .base_loss_configuration import LossConfiguration
-from ..time_level_loss import TimeLevelLoss, L2Loss
-
+from ..time_level_loss import L2Loss, TimeLevelLoss
 from ..utils import extract_ic_and_trj
+from .base_loss_configuration import LossConfiguration
+
 
 class Supervised(LossConfiguration):
     num_rollout_steps: int
@@ -32,7 +30,9 @@ class Supervised(LossConfiguration):
         self.cut_bptt = cut_bptt
         self.cut_bptt_every = cut_bptt_every
         if time_level_weights is None:
-            self.time_level_weights = [1.0,] * self.num_rollout_steps
+            self.time_level_weights = [
+                1.0,
+            ] * self.num_rollout_steps
         else:
             self.time_level_weights = time_level_weights
 
@@ -54,7 +54,7 @@ class Supervised(LossConfiguration):
                 "The number of snapshots in the trajectory is less than the "
                 "number of rollout steps"
             )
-        
+
         pred = ic
         loss = 0.0
 

@@ -1,15 +1,13 @@
-import jax
+from typing import Optional
 
-from typing import Optional, Union
-from abc import ABC, abstractmethod
 import equinox as eqx
+import jax
+from jaxtyping import Array, Float, PyTree
 
-from jaxtyping import Float, Array, PyTree
-
-from .base_loss_configuration import LossConfiguration
-from ..time_level_loss import TimeLevelLoss, L2Loss
-
+from ..time_level_loss import L2Loss, TimeLevelLoss
 from ..utils import extract_ic_and_trj
+from .base_loss_configuration import LossConfiguration
+
 
 class MixChainPostPhysics(LossConfiguration):
     num_rollout_steps: int
@@ -35,7 +33,9 @@ class MixChainPostPhysics(LossConfiguration):
         self.cut_bptt = cut_bptt
         self.cut_bptt_every = cut_bptt_every
         if time_level_weights is None:
-            self.time_level_weights = [1.0,] * (self.num_rollout_steps + self.num_post_physics_steps)
+            self.time_level_weights = [
+                1.0,
+            ] * (self.num_rollout_steps + self.num_post_physics_steps)
         else:
             self.time_level_weights = time_level_weights
 
@@ -57,7 +57,7 @@ class MixChainPostPhysics(LossConfiguration):
                 "The number of snapshots in the trajectory is less than the "
                 "number of rollout steps and post physics steps"
             )
-        
+
         pred = ic
         loss = 0.0
 
@@ -69,9 +69,11 @@ class MixChainPostPhysics(LossConfiguration):
             if self.cut_bptt:
                 if (t + 1) % self.cut_bptt_every == 0:
                     pred = jax.lax.stop_gradient(pred)
-        
+
         # Post physics part
-        for t in range(self.num_rollout_steps, self.num_rollout_steps + self.num_post_physics_steps):
+        for t in range(
+            self.num_rollout_steps, self.num_rollout_steps + self.num_post_physics_steps
+        ):
             pred = jax.vmap(ref_stepper)(pred)
             ref = trj[:, t]
             loss += self.time_level_weights[t] * self.time_level_loss(pred, ref)

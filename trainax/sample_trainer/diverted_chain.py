@@ -1,10 +1,10 @@
-from jaxtyping import PRNGKeyArray
-
 import equinox as eqx
-from ..trainer import Trainer
-from ..time_level_loss import TimeLevelLoss, L2Loss
-from ..mixer import TrajectorySubStacker
+
 from ..loss_configuration import DivertedChainBranchOne
+from ..mixer import TrajectorySubStacker
+from ..time_level_loss import L2Loss, TimeLevelLoss
+from ..trainer import Trainer
+
 
 class DivertedChainBranchOneTrainer(Trainer):
     def __init__(
@@ -14,7 +14,7 @@ class DivertedChainBranchOneTrainer(Trainer):
         ref_stepper: eqx.Module,
         residuum_fn: eqx.Module = None,  # for compatibility
         optimizer,
-        callback_fn = None,
+        callback_fn=None,
         num_training_steps: int,
         batch_size: int,
         num_rollout_steps: int = 1,
@@ -27,7 +27,7 @@ class DivertedChainBranchOneTrainer(Trainer):
     ):
         trajectory_sub_stacker = TrajectorySubStacker(
             data_trajectories,
-            sub_trajectory_len=num_rollout_steps + 1, # +1 for the IC
+            sub_trajectory_len=num_rollout_steps + 1,  # +1 for the IC
             do_sub_stacking=do_sub_stacking,
             only_store_ic=True,  # Not needed because we use the ref_stepper
         )

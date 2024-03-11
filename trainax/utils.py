@@ -2,13 +2,13 @@ import jax.numpy as jnp
 import jax.tree_util as jtu
 from jaxtyping import Array, Float, PyTree
 
-def extract_ic_and_trj(
-    data
-):
+
+def extract_ic_and_trj(data):
     ic = jtu.tree_map(lambda x: x[:, 0], data)
     trj = jtu.tree_map(lambda x: x[:, 1:], data)
 
     return ic, trj
+
 
 def stack_sub_trajectories(
     trj: PyTree[Float[Array, "n_timesteps ..."]],
@@ -31,7 +31,7 @@ def stack_sub_trajectories(
             n, ...)`. `n_stacks` is the number of subtrajectories stacked
             together, i.e., `n_timesteps - n + 1`.
     """
-    n_time_steps = [l.shape[0] for l in jtu.tree_leaves(trj)]
+    n_time_steps = [leaf.shape[0] for leaf in jtu.tree_leaves(trj)]
 
     if len(set(n_time_steps)) != 1:
         raise ValueError(
@@ -55,4 +55,3 @@ def stack_sub_trajectories(
     )
 
     return sub_trjs
-    

@@ -1,6 +1,8 @@
-from jaxtyping import Array
 import jax.numpy as jnp
+from jaxtyping import Array
+
 from .base_time_level_loss import TimeLevelLoss
+
 
 class L2Loss(TimeLevelLoss):
     """

@@ -1,13 +1,12 @@
-import jax
-import jax.numpy as jnp
 import equinox as eqx
+import jax.numpy as jnp
 import optax
+from jaxtyping import PRNGKeyArray
 from tqdm.autonotebook import tqdm
 
-from jaxtyping import PyTree, Float, Array, PRNGKeyArray
+from .loss_configuration import LossConfiguration
+from .mixer import PermutationMixer, TrajectorySubStacker
 
-from .mixer import TrajectorySubStacker, PermutationMixer
-from .loss_configuration import LossConfiguration, Supervised
 
 class Trainer(eqx.Module):
     trajectory_sub_stacker: TrajectorySubStacker
@@ -29,7 +28,7 @@ class Trainer(eqx.Module):
         optimizer: optax.GradientTransformation,
         num_minibatches: int,
         batch_size: int,
-        callback_fn = None,
+        callback_fn=None,
     ):
         self.trajectory_sub_stacker = trajectory_sub_stacker
         self.loss_configuration = loss_configuration
@@ -39,7 +38,7 @@ class Trainer(eqx.Module):
         self.num_minibatches = num_minibatches
         self.batch_size = batch_size
         self.callback_fn = callback_fn
-    
+
     def step_fn(
         self,
         stepper,
@@ -112,5 +111,4 @@ class Trainer(eqx.Module):
             if return_loss_history:
                 return trained_stepper, loss_history
             else:
-                return trained_stepper   
-
+                return trained_stepper

@@ -1,15 +1,13 @@
-import jax
+from typing import Optional
 
-from typing import Optional, Union
-from abc import ABC, abstractmethod
 import equinox as eqx
+import jax
+from jaxtyping import Array, Float, PyTree
 
-from jaxtyping import Float, Array, PyTree
-
-from .base_loss_configuration import LossConfiguration
-from ..time_level_loss import TimeLevelLoss, L2Loss
-
+from ..time_level_loss import L2Loss, TimeLevelLoss
 from ..utils import extract_ic_and_trj
+from .base_loss_configuration import LossConfiguration
+
 
 class Residuum(LossConfiguration):
     num_rollout_steps: int
@@ -38,7 +36,9 @@ class Residuum(LossConfiguration):
         self.cut_prev = cut_prev
         self.cut_next = cut_next
         if time_level_weights is None:
-            self.time_level_weights = [1.0,] * self.num_rollout_steps
+            self.time_level_weights = [
+                1.0,
+            ] * self.num_rollout_steps
         else:
             self.time_level_weights = time_level_weights
 
@@ -67,9 +67,9 @@ class Residuum(LossConfiguration):
             else:
                 pred_next_mod = pred_next
 
-            loss += self.time_level_weights[t] * self.time_level_loss(residuum_fn(
-                pred_next_mod, pred_prev_mod
-            ))
+            loss += self.time_level_weights[t] * self.time_level_loss(
+                residuum_fn(pred_next_mod, pred_prev_mod)
+            )
 
             if self.cut_bptt and (t + 1) % self.cut_bptt_every == 0:
                 pred_prev = jax.lax.stop_gradient(pred_next)
