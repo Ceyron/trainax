@@ -1,4 +1,9 @@
-from .base_time_level_loss import TimeLevelLoss
+"""
+A loss is a time-level comparison between two discrete states.
+"""
+
+
+from .base_loss import BaseLoss
 from .l2_loss import L2Loss
 
-__all__ = ["TimeLevelLoss", "L2Loss"]
+__all__ = ["BaseLoss", "L2Loss"]

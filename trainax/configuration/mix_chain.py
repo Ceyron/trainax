@@ -4,14 +4,14 @@ import equinox as eqx
 import jax
 from jaxtyping import Array, Float, PyTree
 
-from ..loss import L2Loss, TimeLevelLoss
+from ..loss import BaseLoss, L2Loss
 from ..utils import extract_ic_and_trj
-from .base_loss_configuration import LossConfiguration
+from .base_configuration import BaseConfiguration
 
 
-class MixChainPostPhysics(LossConfiguration):
+class MixChainPostPhysics(BaseConfiguration):
     num_rollout_steps: int
-    time_level_loss: TimeLevelLoss
+    time_level_loss: BaseLoss
     num_post_physics_steps: int
     cut_bptt: bool
     cut_bptt_every: int
@@ -21,7 +21,7 @@ class MixChainPostPhysics(LossConfiguration):
         self,
         num_rollout_steps: int = 1,
         *,
-        time_level_loss: TimeLevelLoss = L2Loss(),
+        time_level_loss: BaseLoss = L2Loss(),
         num_post_physics_steps: int = 1,
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,

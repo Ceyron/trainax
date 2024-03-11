@@ -2,7 +2,7 @@ import equinox as eqx
 
 from ..configuration import DivertedChainBranchOne
 from ..general_trainer import GeneralTrainer
-from ..loss import L2Loss, TimeLevelLoss
+from ..loss import BaseLoss, L2Loss
 from ..mixer import TrajectorySubStacker
 
 
@@ -18,7 +18,7 @@ class DivertedChainBranchOneTrainer(GeneralTrainer):
         num_training_steps: int,
         batch_size: int,
         num_rollout_steps: int = 1,
-        time_level_loss: TimeLevelLoss = L2Loss(),
+        time_level_loss: BaseLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
         cut_div_chain: bool = False,

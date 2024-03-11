@@ -1,10 +1,10 @@
 import jax.numpy as jnp
 from jaxtyping import Array
 
-from .base_time_level_loss import TimeLevelLoss
+from .base_loss import BaseLoss
 
 
-class L2Loss(TimeLevelLoss):
+class L2Loss(BaseLoss):
     """
     Simple Mean Squared Error loss.
     """

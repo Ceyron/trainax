@@ -1,10 +1,10 @@
 from equinox import Module
 
-from .base_loss_configuration import LossConfiguration
+from .base_configuration import BaseConfiguration
 
 
-class CompositeLossConfiguratoin(LossConfiguration):
-    configurations: list[LossConfiguration]
+class CompositeLossConfiguratoin(BaseConfiguration):
+    configurations: list[BaseConfiguration]
     weights: list[float]
 
     def __call__(

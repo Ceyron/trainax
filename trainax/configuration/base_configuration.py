@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 import equinox as eqx
 
 
-class LossConfiguration(eqx.Module, ABC):
+class BaseConfiguration(eqx.Module, ABC):
     @abstractmethod
     def __call__(
         self,

@@ -4,13 +4,13 @@ import optax
 from jaxtyping import PRNGKeyArray
 from tqdm.autonotebook import tqdm
 
-from .configuration import LossConfiguration
+from .configuration import BaseConfiguration
 from .mixer import PermutationMixer, TrajectorySubStacker
 
 
 class GeneralTrainer(eqx.Module):
     trajectory_sub_stacker: TrajectorySubStacker
-    loss_configuration: LossConfiguration
+    loss_configuration: BaseConfiguration
     ref_stepper: eqx.Module
     residuum_fn: eqx.Module
     optimizer: optax.GradientTransformation
@@ -21,7 +21,7 @@ class GeneralTrainer(eqx.Module):
     def __init__(
         self,
         trajectory_sub_stacker: TrajectorySubStacker,
-        loss_configuration: LossConfiguration,
+        loss_configuration: BaseConfiguration,
         *,
         ref_stepper: eqx.Module = None,
         residuum_fn: eqx.Module = None,
