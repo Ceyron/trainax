@@ -60,6 +60,7 @@ class GeneralTrainer(eqx.Module):
         key: PRNGKeyArray,
         *,
         return_loss_history: bool = True,
+        record_loss_every: int = 1,
     ):
         loss_history = []
         if self.callback_fn is not None:
@@ -91,7 +92,8 @@ class GeneralTrainer(eqx.Module):
             trained_stepper, opt_state, loss = update_fn(
                 trained_stepper, opt_state, data
             )
-            loss_history.append(loss)
+            if update_i % record_loss_every == 0:
+                loss_history.append(loss)
             p_meter.update(1)
 
             p_meter.set_description(
