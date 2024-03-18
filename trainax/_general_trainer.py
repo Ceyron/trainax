@@ -39,6 +39,17 @@ class GeneralTrainer(eqx.Module):
         self.batch_size = batch_size
         self.callback_fn = callback_fn
 
+    def full_loss(
+        self,
+        stepper: eqx.Module,
+    ):
+        return self.loss_configuration(
+            stepper,
+            self.trajectory_sub_stacker.data_sub_trajectories,
+            ref_stepper=self.ref_stepper,
+            residuum_fn=self.residuum_fn,
+        )
+
     def step_fn(
         self,
         stepper,
