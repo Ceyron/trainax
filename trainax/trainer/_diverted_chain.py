@@ -1,7 +1,10 @@
+from typing import Optional
+
 import equinox as eqx
 
 from .._general_trainer import GeneralTrainer
 from .._mixer import TrajectorySubStacker
+from ..callback import BaseCallback
 from ..configuration import DivertedChainBranchOne
 from ..loss import BaseLoss, L2Loss
 
@@ -14,7 +17,7 @@ class DivertedChainBranchOneTrainer(GeneralTrainer):
         ref_stepper: eqx.Module,
         residuum_fn: eqx.Module = None,  # for compatibility
         optimizer,
-        callback_fn=None,
+        callback_fn: Optional[BaseCallback] = None,
         num_training_steps: int,
         batch_size: int,
         num_rollout_steps: int = 1,

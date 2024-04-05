@@ -1,7 +1,10 @@
+from typing import Optional
+
 import equinox as eqx
 
 from .._general_trainer import GeneralTrainer
 from .._mixer import TrajectorySubStacker
+from ..callback import BaseCallback
 from ..configuration import Residuum
 from ..loss import BaseLoss, L2Loss
 
@@ -14,7 +17,7 @@ class ResiduumTrainer(GeneralTrainer):
         ref_stepper: eqx.Module = None,  # for compatibility
         residuum_fn: eqx.Module,
         optimizer,
-        callback_fn=None,
+        callback_fn: Optional[BaseCallback] = None,
         num_training_steps: int,
         batch_size: int,
         num_rollout_steps: int = 1,

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import equinox as eqx
 import jax.numpy as jnp
 import optax
@@ -5,6 +7,7 @@ from jaxtyping import PRNGKeyArray
 from tqdm.autonotebook import tqdm
 
 from ._mixer import PermutationMixer, TrajectorySubStacker
+from .callback import BaseCallback
 from .configuration import BaseConfiguration
 
 
@@ -16,7 +19,7 @@ class GeneralTrainer(eqx.Module):
     optimizer: optax.GradientTransformation
     num_minibatches: int
     batch_size: int
-    callback_fn: eqx.Module
+    callback_fn: BaseCallback
 
     def __init__(
         self,
@@ -28,7 +31,7 @@ class GeneralTrainer(eqx.Module):
         optimizer: optax.GradientTransformation,
         num_minibatches: int,
         batch_size: int,
-        callback_fn=None,
+        callback_fn: Optional[BaseCallback] = None,
     ):
         self.trajectory_sub_stacker = trajectory_sub_stacker
         self.loss_configuration = loss_configuration
@@ -73,6 +76,10 @@ class GeneralTrainer(eqx.Module):
         return_loss_history: bool = True,
         record_loss_every: int = 1,
     ):
+        """
+        If no callback function is provided (i.e. is set to None), this function
+        has at max two return values.
+        """
         loss_history = []
         if self.callback_fn is not None:
             aux_history = []
