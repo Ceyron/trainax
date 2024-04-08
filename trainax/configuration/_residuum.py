@@ -2,6 +2,7 @@ from typing import Optional
 
 import equinox as eqx
 import jax
+import jax.numpy as jnp
 from jaxtyping import Array, Float, PyTree
 
 from .._utils import extract_ic_and_trj
@@ -16,7 +17,7 @@ class Residuum(BaseConfiguration):
     cut_bptt_every: int
     cut_prev: bool
     cut_next: bool
-    time_level_weights: list[float]
+    time_level_weights: Float[Array, "num_rollout_steps"]
 
     def __init__(
         self,
@@ -27,7 +28,7 @@ class Residuum(BaseConfiguration):
         cut_bptt_every: int = 1,
         cut_prev: bool = False,
         cut_next: bool = False,
-        time_level_weights: Optional[list[float]] = None,
+        time_level_weights: Optional[Float[Array, "num_rollout_steps"]] = None,
     ):
         self.num_rollout_steps = num_rollout_steps
         self.time_level_loss = time_level_loss
@@ -36,9 +37,7 @@ class Residuum(BaseConfiguration):
         self.cut_prev = cut_prev
         self.cut_next = cut_next
         if time_level_weights is None:
-            self.time_level_weights = [
-                1.0,
-            ] * self.num_rollout_steps
+            self.time_level_weights = jnp.ones(self.num_rollout_steps)
         else:
             self.time_level_weights = time_level_weights
 

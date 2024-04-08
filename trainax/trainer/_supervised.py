@@ -1,6 +1,7 @@
 from typing import Optional
 
 import equinox as eqx
+from jaxtyping import Array, Float
 
 from .._general_trainer import GeneralTrainer
 from .._mixer import TrajectorySubStacker
@@ -24,7 +25,9 @@ class SupervisedTrainer(GeneralTrainer):
         time_level_loss: BaseLoss = L2Loss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
-        time_level_weights: list[float] = None,
+        time_level_weights: Optional[
+            Float[Array, "num_rollout_steps"]  # noqa F821
+        ] = None,
         do_sub_stacking: bool = True,
     ):
         trajectory_sub_stacker = TrajectorySubStacker(
