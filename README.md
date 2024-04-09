@@ -61,3 +61,27 @@ where $l$ is a **time-level loss**. In the easiest case $l = \text{MSE}$.
 ### More
 
 Focus is clearly on the number of update steps, not on the number of epochs
+
+
+### A taxonomy of learning setups
+
+The major axes that need to be chosen are:
+
+* The rollout length (how often the network is applied autoregressively on the input)
+* The branch length (how long the reference goes alongside the network; we get
+  full supervised if that is as long as the rollout length)
+* Whether the physics is resolved (diverted-chain and supervised) or only given
+  as a condition (residuum-based loss)
+
+Additional axes are:
+
+* The time level loss (how two states are compared, or a residuum state is reduced)
+* The time level weights (if there is network rollout, shall states further away
+  from the initial condition be weighted differently (like exponential
+  discounting in reinforcement learning))
+* If the main chain of network rollout is interleaved with a physics solver (-> mix chain)
+* Modifications to the gradient flow:
+    * Cutting the backpropagation through time in the main chain (after each
+      step, or sparse)
+    * Cutting the diverted physics
+    * Cutting the one or both levels of the inputs to a residuum function.
