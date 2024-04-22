@@ -7,7 +7,7 @@ import trainax as tx
 
 
 @pytest.mark.parametrize("num_rollout_steps", [1, 2, 3, 4, 5])
-def test_diverted_chain_rollout_configuration(num_rollout_steps):
+def test_diverted_chain_branch_one_rollout_configuration(num_rollout_steps):
     div_rollout_config = tx.configuration.DivertedChainBranchOne(num_rollout_steps)
 
     def manual_loss_fn(model, data, *, ref_stepper, residuum_fn=None):
@@ -26,7 +26,7 @@ def test_diverted_chain_rollout_configuration(num_rollout_steps):
 
 
 @pytest.mark.parametrize("num_rollout_steps", [1, 2, 3, 4, 5])
-def test_diverted_chain_rollout_configuration_cut_bptt(num_rollout_steps):
+def test_diverted_chain_branch_one_rollout_configuration_cut_bptt(num_rollout_steps):
     """
     Completely cuts the backpropagation through time
     """
@@ -52,7 +52,9 @@ def test_diverted_chain_rollout_configuration_cut_bptt(num_rollout_steps):
 
 
 @pytest.mark.parametrize("num_rollout_steps", [1, 2, 3, 4, 5])
-def test_diverted_chain_rollout_configuration_cut_div_chain(num_rollout_steps):
+def test_diverted_chain_branch_one_rollout_configuration_cut_div_chain(
+    num_rollout_steps,
+):
     """
     Completely cuts the diverted chain
     """
@@ -77,7 +79,9 @@ def test_diverted_chain_rollout_configuration_cut_div_chain(num_rollout_steps):
 
 
 @pytest.mark.parametrize("num_rollout_steps", [1, 2, 3, 4, 5])
-def test_diverted_chain_rollout_configuration_cut_bptt_and_div_chain(num_rollout_steps):
+def test_diverted_chain_branch_one_rollout_configuration_cut_bptt_and_div_chain(
+    num_rollout_steps,
+):
     """
     Completely cuts the backpropagation through time and the diverted chain
     """
@@ -104,7 +108,7 @@ def test_diverted_chain_rollout_configuration_cut_bptt_and_div_chain(num_rollout
 
 
 @pytest.mark.parametrize("num_rollout_steps", [1, 2, 3, 4, 5, 7, 8, 9])
-def test_diverted_chain_rollout_configuration_sparse_bptt(num_rollout_steps):
+def test_diverted_chain_branch_one_rollout_configuration_sparse_bptt(num_rollout_steps):
     """
     Cuts the bptt every three steps
     """
