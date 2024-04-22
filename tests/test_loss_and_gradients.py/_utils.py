@@ -19,9 +19,8 @@ def run(loss_config, manual_loss_fn):
 
     # (batch_size, num_rollout_steps+1, num_dof)  [not using conv format with channels here]
 
-    # using plenty of rollout to cover all potential scenarios
-    shape = (5, 100, NUM_DOF)
-    dummy_data = jax.random.normal(jax.random.PRNGKey(0), shape)
+    shape = (5, NUM_DOF)
+    dummy_ic = jax.random.normal(jax.random.PRNGKey(0), shape)
 
     dummy_mlp = eqx.nn.MLP(
         in_size=NUM_DOF,
@@ -57,6 +56,14 @@ def run(loss_config, manual_loss_fn):
         activation=jax.nn.relu,
         key=jax.random.PRNGKey(77),
     )
+
+    dummy_data = [
+        dummy_ic,
+    ]
+    # Using plenty of time steps to cover the whole trajectory
+    for t in range(20):
+        dummy_data.append(jax.vmap(dummy_ref_mlp)(dummy_data[-1]))
+    dummy_data = jnp.stack(dummy_data, axis=1)
 
     def residuum_fn(next, prev):
         return jnp.mean(
