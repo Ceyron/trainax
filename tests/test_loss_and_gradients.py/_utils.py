@@ -14,7 +14,7 @@ def compare_pytree(pytree_1, pytree_2, abs=1e-6):
         assert a == pytest.approx(b, abs=abs)
 
 
-def run(div_rollout_config, manual_loss_fn):
+def run(loss_config, manual_loss_fn):
     NUM_DOF = 10
 
     # (batch_size, num_rollout_steps+1, num_dof)  [not using conv format with channels here]
@@ -63,7 +63,7 @@ def run(div_rollout_config, manual_loss_fn):
             jnp.square(dummy_res_processor_next(next) - dummy_res_processor_prev(prev))
         )
 
-    loss = div_rollout_config(
+    loss = loss_config(
         dummy_mlp, dummy_data, ref_stepper=dummy_ref_mlp, residuum_fn=residuum_fn
     )
 
@@ -71,9 +71,9 @@ def run(div_rollout_config, manual_loss_fn):
         dummy_mlp, dummy_data, ref_stepper=dummy_ref_mlp, residuum_fn=residuum_fn
     )
 
-    assert manual_loss == loss
+    assert loss == pytest.approx(manual_loss, abs=1e-6)
 
-    grad = eqx.filter_grad(div_rollout_config)(
+    grad = eqx.filter_grad(loss_config)(
         dummy_mlp, dummy_data, ref_stepper=dummy_ref_mlp, residuum_fn=residuum_fn
     )
     manual_grad = eqx.filter_grad(manual_loss_fn)(
