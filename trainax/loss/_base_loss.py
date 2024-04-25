@@ -10,5 +10,5 @@ class BaseLoss(eqx.Module, ABC):
         self,
         prediction: Array,
         target: Array,
-    ):
+    ) -> float:
         pass
