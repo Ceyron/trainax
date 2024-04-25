@@ -4,7 +4,7 @@ from jaxtyping import Array
 from ._base_loss import BaseLoss
 
 
-class L2Loss(BaseLoss):
+class MSELoss(BaseLoss):
     """
     Simple Mean Squared Error loss.
     """

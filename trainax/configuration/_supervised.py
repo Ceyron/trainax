@@ -6,7 +6,7 @@ import jax.numpy as jnp
 from jaxtyping import Array, Float, PyTree
 
 from .._utils import extract_ic_and_trj
-from ..loss import BaseLoss, L2Loss
+from ..loss import BaseLoss, MSELoss
 from ._base_configuration import BaseConfiguration
 
 
@@ -21,7 +21,7 @@ class Supervised(BaseConfiguration):
         self,
         num_rollout_steps: int = 1,
         *,
-        time_level_loss: BaseLoss = L2Loss(),
+        time_level_loss: BaseLoss = MSELoss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
         time_level_weights: Optional[Float[Array, "num_rollout_steps"]] = None,

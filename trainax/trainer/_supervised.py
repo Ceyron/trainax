@@ -7,7 +7,7 @@ from .._general_trainer import GeneralTrainer
 from .._mixer import TrajectorySubStacker
 from ..callback import BaseCallback
 from ..configuration import Supervised
-from ..loss import BaseLoss, L2Loss
+from ..loss import BaseLoss, MSELoss
 
 
 class SupervisedTrainer(GeneralTrainer):
@@ -22,7 +22,7 @@ class SupervisedTrainer(GeneralTrainer):
         num_training_steps: int,
         batch_size: int,
         num_rollout_steps: int = 1,
-        time_level_loss: BaseLoss = L2Loss(),
+        time_level_loss: BaseLoss = MSELoss(),
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
         time_level_weights: Optional[
