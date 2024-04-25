@@ -17,6 +17,6 @@ method, i.e., `loss_fn(...)`.
 
 
 from ._base_loss import BaseLoss
-from ._l2_loss import MSELoss
+from ._mse_loss import MSELoss
 
 __all__ = ["BaseLoss", "MSELoss"]
