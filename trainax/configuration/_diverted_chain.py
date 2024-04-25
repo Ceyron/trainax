@@ -39,6 +39,8 @@ class DivertedChain(BaseConfiguration):
         new users.)
 
         The implementation is rather inefficient!
+
+              L(θ) = 𝔼ᵤ  [ ∑ₜ₌₁ᵀ⁻ᴮ ∑_b₌₁ᴮ wₜ w_b l(  f_θᵗ⁺ᵇ(u),  𝒫ᵇ(f_θᵗ(u)) ) ]
         """
         if num_branch_steps > num_rollout_steps:
             raise ValueError(
