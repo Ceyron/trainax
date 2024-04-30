@@ -18,5 +18,6 @@ method, i.e., `loss_fn(...)`.
 
 from ._base_loss import BaseLoss
 from ._mse_loss import MSELoss, Normalized_MSELoss
+from ._mae_loss import MAELoss, Normalized_MAELoss
 
-__all__ = ["BaseLoss", "MSELoss", Normalized_MSELoss]
+__all__ = ["BaseLoss", "MSELoss", "Normalized_MSELoss", "MAELoss", "Normalized_MAELoss"]
