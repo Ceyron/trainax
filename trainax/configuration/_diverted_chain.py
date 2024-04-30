@@ -33,14 +33,52 @@ class DivertedChain(BaseConfiguration):
         branch_level_weights: Optional[Float[Array, "num_branch_steps"]] = None,
     ):
         """
-        Most general configuration for diverted chain training. When setting
-        `num_branch_steps` to 1, this configuration is equivalent to
-        `DivertedChainBranchOne`. (which is probably a better starting point for
-        new users.)
+        General diverted chain (rollout) configuration.
 
-        The implementation is rather inefficient!
+        Contains the `Supervised` configuration as special case of
+        `num_branch_steps=num_rollout_steps` and the `DivertedChainBranchOne`
+        configuration as special case of `num_branch_steps=1`.
 
-              L(θ) = 𝔼ᵤ  [ ∑ₜ₌₁ᵀ⁻ᴮ ∑_b₌₁ᴮ wₜ w_b l(  f_θᵗ⁺ᵇ(u),  𝒫ᵇ(f_θᵗ(u)) ) ]
+        Args:
+            num_rollout_steps (int): The number of time steps to
+                autoregressively roll out the model. Defaults to 1.
+            num_branch_steps (int): The number of time steps to branch off the
+                main chain. Must be less than or equal to `num_rollout_steps`.
+                Defaults to 1.
+            time_level_loss (BaseLoss): The loss function to use at
+                each time step. Defaults to MSELoss().
+            cut_bptt (bool): Whether to cut the backpropagation through time
+                (BPTT), i.e., insert a `jax.lax.stop_gradient` into the
+                autoregressive network main chain. Defaults to False.
+            cut_bptt_every (int): The frequency at which to cut the BPTT.
+                Only relevant if `cut_bptt` is True. Defaults to 1 (meaning
+                after each step).
+            cut_div_chain (bool): Whether to cut the diverted chain, i.e.,
+                insert a `jax.lax.stop_gradient` to not have cotangents flow
+                over the `ref_stepper`. In this case, the `ref_stepper` does not
+                have to be differentiable. Defaults to False.
+            time_level_weights (array[float], optional): An array of length
+                `num_rollout_steps` that contains the weights for each time
+                step. Defaults to None, which means that all time steps have the
+                same weight (=1.0).
+            branch_level_weights (array[float], optional): An array of length
+                `num_branch_steps` that contains the weights for each branch
+                step. Defaults to None, which means that all branch steps have
+                the same weight (=1.0).
+
+        Raises:
+            ValueError: If `num_branch_steps` is greater than
+                `num_rollout_steps`.
+
+        Info:
+            * The `ref_stepper` is called on-the-fly. If its forward (and vjp)
+                evaluation is expensive, this will dominate the computational
+                cost of this configuration.
+            * The usage of the `ref_stepper` includes the first branch starting
+                from the initial condition. Hence, no reference trajectory is
+                required.
+            * Under reverse-mode automatic differentiation memory usage grows
+                with the product of `num_rollout_steps` and `num_branch_steps`.
         """
         if num_branch_steps > num_rollout_steps:
             raise ValueError(
@@ -70,6 +108,27 @@ class DivertedChain(BaseConfiguration):
         ref_stepper: eqx.Module,
         residuum_fn: eqx.Module = None,  # unused
     ) -> float:
+        """
+        Evaluate the general diverted chain (rollout) configuration on the given
+        data.
+
+        The data only has to contain one time level, the initial condition.
+
+        Args:
+            stepper (eqx.Module): The stepper to use for the configuration. Must
+                have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
+            data (PyTree): The data to evaluate the configuration on. This
+                depends on the concrete configuration. In this case, it only
+                has to contain the set of initial states.
+            ref_stepper (eqx.Module): The reference stepper to use for the
+                diverted chain. This is called on-the-fly. (keyword-only
+                argument)
+            residuum_fn (eqx.Module): For compatibility with other
+                configurations; not used. (keyword-only argument)
+
+        Returns:
+            float: The loss value computed by this configuration.
+        """
         # Data is supposed to contain the initial condition, trj is not used
         ic, _ = extract_ic_and_trj(data)
 
