@@ -85,3 +85,38 @@ Additional axes are:
       step, or sparse)
     * Cutting the diverted physics
     * Cutting the one or both levels of the inputs to a residuum function.
+
+### Implementation details
+
+There are three levels of hierarchy:
+
+1. The `loss` submodule defines time-level wise comparisons between two states.
+   A state is either a tensor of shape `(num_channels, ...)` (with ellipsis
+   indicating an arbitrary number of spatial dim,ensions) or a tensor of shape
+   `(num_batches, num_channels, ...)`. The time level loss is implemented for
+   the former but allows additional vectorized and (mean-)aggregated on the
+   latter. (In the schematic above, the time-level loss is the green circle).
+2. The `configuration` submodule devises how neural time stepper $f_\theta$
+   (denoted *NN* in the schematic) interplays with the numerical simulator
+   $\mathcal{P}$. Similar to the time-level loss this is a callable PyTree which
+   requires during calling the neural stepper and some data. What this data
+   contains depends on the concrete configuration. For supervised rollout
+   training it is the batch of (sub-) trajectories to be considered. Other
+   configurations might also require the reference stepper or a two consecutive
+   time level based residuum function. Each configuration is essentially an
+   abstract implementation of the major methodologies (supervised,
+   diverted-chain, mix-chain, residuum). The most general diverted chain
+   implementation contains supervised and branch-one diverted chain as special
+   cases. See the section "Relation between Diverted Chain and Residuum
+   Training" for details how residuum training fits into the picture. All
+   configurations allow setting additional constructor arguments to, e.g., cut
+   the backpropagation through time (sparsely) or to supply time-level
+   weightings (for example to exponentially discount contributions over long
+   rollouts).
+3. The `training` submodule combines a configuration together with stochastic
+   minibatching on a set of reference trajectories. For each configuration,
+   there is a corresponding trainer that essentially is sugarcoating around
+   combining the relevant configuration with the `GeneralTrainer` and a
+   trajectory substacker.
+
+### Relation between Diverted Chain and Residuum Training
