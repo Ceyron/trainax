@@ -47,8 +47,12 @@ class Supervised(BaseConfiguration):
                 after each step).
             time_level_weights (array[float], optional): An array of length
                 `num_rollout_steps` that contains the weights for each time
-                step. Defaults to None, which means that all time steps have
-                the same weight (=1.0).
+                step. Defaults to None, which means that all time steps have the
+                same weight (=1.0).
+
+        Info:
+            * Under reverse-mode automatic differentiation memory usage grows
+                linearly with `num_rollout_steps`.
         """
         self.num_rollout_steps = num_rollout_steps
         self.time_level_loss = time_level_loss
