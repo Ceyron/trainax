@@ -18,7 +18,6 @@ class BaseConfiguration(eqx.Module, ABC):
         Evaluate the configuration on the given data.
 
         Args:
-
             stepper (eqx.Module): The stepper to use for the configuration. Must
                 have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
             data (PyTree): The data to evaluate the configuration on. This
