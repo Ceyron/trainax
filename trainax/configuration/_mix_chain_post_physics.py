@@ -47,7 +47,7 @@ class MixChainPostPhysics(BaseConfiguration):
         stepper: eqx.Module,
         data: PyTree[Float[Array, "batch num_snapshots ..."]],
         *,
-        ref_stepper: eqx.Module,  # unused
+        ref_stepper: eqx.Module,
         residuum_fn: eqx.Module = None,  # unused
     ) -> float:
         # Data is supposed to contain both the initial condition and the target
