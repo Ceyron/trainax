@@ -22,7 +22,7 @@ class TrajectorySubStacker(eqx.Module):
     ):
         """
         Slice a batch of trajectories into sub-trajectories.
-        
+
         Useful to create windows of specific length for (rollout) training
         methodologies of autoregressive neural emulators.
 

@@ -86,7 +86,7 @@ class Supervised(BaseConfiguration):
                 configurations; not used. (keyword-only argument) residuum_fn
             residuum_fn (eqx.Module): For compatibility with other
                 configurations; not used. (keyword-only argument)
-        
+
         Returns:
             float: The loss value computed by this configuration.
 

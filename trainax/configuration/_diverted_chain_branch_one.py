@@ -29,8 +29,8 @@ class DivertedChainBranchOne(BaseConfiguration):
         time_level_weights: Optional[Float[Array, "num_rollout_steps"]] = None,
     ):
         """
-        Diverted chain (rollout) configuration with branch length fixed to one. 
-    
+        Diverted chain (rollout) configuration with branch length fixed to one.
+
         Essentially, this amounts to a one-step difference to a reference
         (create on the fly by the differentiable `ref_stepper`). Falls back to
         classical one-step supervised training for `num_rollout_steps=1`
