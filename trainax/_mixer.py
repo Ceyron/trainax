@@ -99,6 +99,26 @@ class PermutationMixer(eqx.Module):
         batch_size: int,
         shuffle_key: PRNGKeyArray,
     ):
+        """
+        Precompute permuations for a given number of minibatches within a
+        dataset. Automatically determines the number of epochs necessary. Upon
+        calling returns a collection of indices to produce a new minibatch.
+
+        If the remainder minibatch in one epoch is smaller than the batch size,
+        it will **not** be extended using data from the next epoch, but returned
+        as smaller list of indices.
+
+        Args:
+            num_total_samples (int): The total number of samples in the dataset.
+            num_minibatches (int): The size of minibatches to train on.
+            batch_size (int): The size of the minibatches.
+            shuffle_key (PRNGKeyArray): The key to create the permutation; needed for
+                deterministic reproducibility.
+
+        Raises:
+            ValueError: If the batch size is larger than the total number of
+            samples for one epoch.
+        """
         if num_total_samples < batch_size:
             print(
                 f"batch size {batch_size} is larger than the total number of samples {num_total_samples}"
@@ -136,7 +156,21 @@ class PermutationMixer(eqx.Module):
         return_info: bool = False,
     ):
         """
-        `i` the batch index
+        Given the batch index `i`, return the corresponding indices to slice out
+        the minibatch.
+
+        Args:
+            i (int): The batch index.
+            return_info (bool, optional): Whether to return additional
+                information about the current epoch and batch index. Defaults to
+                False.
+
+        Returns:
+            Array: The indices to slice out the minibatch.
+
+        Raises:
+            ValueError: If the batch index is larger than the number of
+                minibatches (because likely there will be no permuation for it)
         """
         if i >= self.num_minibatches:
             raise ValueError("Batch index out of range")
