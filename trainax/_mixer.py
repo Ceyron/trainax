@@ -190,10 +190,6 @@ class PermutationMixer(eqx.Module):
 
 
 class TrajectoryMixer(eqx.Module):
-    """
-    Convenience class to combine `TrajectorySubStacker` and `PermutationMixer`
-    """
-
     trajectory_sub_stacker: TrajectorySubStacker
     permutation_mixer: PermutationMixer
 
@@ -208,9 +204,37 @@ class TrajectoryMixer(eqx.Module):
         do_sub_stacking: bool = True,
         only_store_ic: bool = False,
     ):
-        print(
-            "Please prefer using the `TrajectorySubStacker` and `PermutationMixer` directly"
-        )
+        """
+        Convenience class to combine `TrajectorySubStacker` and
+        `PermutationMixer`. Please prefer using the `TrajectorySubStacker` and
+        `PermutationMixer` directly.
+
+        Args:
+            data_trajectories (PyTree[Float[Array, "num_samples trj_len ..."]]):
+                The batch of trajectories to slice. This must be a PyTree of
+                Arrays who have at least two leading axes: a batch-axis and a
+                time axis. For example, the zeroth axis can be associated with
+                multiple initial conditions or constitutive parameters and the
+                first axis represents all temporal snapshots. A PyTree can also
+                just be an array. You can provide additional leafs in the
+                PyTree, e.g., for the corresponding constitutive parameters etc.
+                Make sure that the emulator has the corresponding signature.
+            sub_trajectory_len (int): The length of the sub-trajectories. This
+                must be smaller equal to the length of the trajectories
+                (`trj_len`). For rollout training with `t` steps, set this to
+                `t+1` to include the necessary initial condition.
+            num_minibatches (int): The number of minibatches to train on.
+            batch_size (int): The size of the minibatches.
+            shuffle_key (PRNGKeyArray): The key to create the permutation; needed for
+                deterministic reproducibility.
+            do_sub_stacking (bool, optional): Whether to slice out all possible
+                (overlapping) windows out of the `trj_len` or just slice the
+                `trj_len` axis from `0:sub_trajectory_len`. Defaults to True.
+            only_store_ic (bool, optional): Whether to only store the initial
+                condition of the sub-trajectories. This can be helpful for
+                configurations that do not need the reference trajectory like
+                residuum-based learning strategies. Defaults to False.
+        """
         self.trajectory_sub_stacker = TrajectorySubStacker(
             data_trajectories,
             sub_trajectory_len,
@@ -231,6 +255,19 @@ class TrajectoryMixer(eqx.Module):
         *,
         return_info: bool = False,
     ):
+        """
+        Given the batch index `i`, return the corresponding sub-trajectories.
+
+        Args:
+            i (int): The batch index.
+            return_info (bool, optional): Whether to return additional
+                information about the current epoch and batch index. Defaults to
+                False.
+
+        Returns:
+            PyTree[Float[Array, "batch_size sub_trj_len ..."]]: The
+                sub-trajectories corresponding to the batch index.
+        """
         if return_info:
             batch_indices, permutation_info = self.permutation_mixer(
                 i, return_info=True
