@@ -47,7 +47,7 @@ class Residuum(BaseConfiguration):
         data: PyTree[Float[Array, "batch num_snapshots ..."]],
         *,
         ref_stepper: eqx.Module = None,  # unused
-        residuum_fn: eqx.Module = None,  # unused
+        residuum_fn: eqx.Module,  # unused
     ) -> float:
         # Data is supposed to contain the initial condition, trj is not used
         ic, _ = extract_ic_and_trj(data)
