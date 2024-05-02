@@ -20,6 +20,34 @@ class TrajectorySubStacker(eqx.Module):
         do_sub_stacking: bool = True,
         only_store_ic: bool = False,
     ):
+        """
+        Slice a batch of trajectories into sub-trajectories.
+        
+        Useful to create windows of specific length for (rollout) training
+        methodologies of autoregressive neural emulators.
+
+        Args:
+            data_trajectories (PyTree[Float[Array, "num_samples trj_len ..."]]):
+                The batch of trajectories to slice. This must be a PyTree of
+                Arrays who have at least two leading axes: a batch-axis and a
+                time axis. For example, the zeroth axis can be associated with
+                multiple initial conditions or constitutive parameters and the
+                first axis represents all temporal snapshots. A PyTree can also
+                just be an array. You can provide additional leafs in the
+                PyTree, e.g., for the corresponding constitutive parameters etc.
+                Make sure that the emulator has the corresponding signature.
+            sub_trajectory_len (int): The length of the sub-trajectories. This
+                must be smaller equal to the length of the trajectories
+                (`trj_len`). For rollout training with `t` steps, set this to
+                `t+1` to include the necessary initial condition.
+            do_sub_stacking (bool, optional): Whether to slice out all possible
+                (overlapping) windows out of the `trj_len` or just slice the
+                `trj_len` axis from `0:sub_trajectory_len`. Defaults to True.
+            only_store_ic (bool, optional): Whether to only store the initial
+                condition of the sub-trajectories. This can be helpful for
+                configurations that do not need the reference trajectory like
+                residuum-based learning strategies. Defaults to False.
+        """
         if do_sub_stacking:
             # return shape is (num_samples, num_stacks, sub_trj_len, ...)
             stacked_sub_trajectories = jax.vmap(
@@ -49,6 +77,9 @@ class TrajectorySubStacker(eqx.Module):
         self,
         indices,
     ):
+        """
+        Slice out sub-samples based on the given indices.
+        """
         return jtu.tree_map(lambda x: x[indices], self.data_sub_trajectories)
 
 
