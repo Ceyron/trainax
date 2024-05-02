@@ -3,7 +3,7 @@ from equinox import Module
 from ._base_configuration import BaseConfiguration
 
 
-class CompositeLossConfiguratoin(BaseConfiguration):
+class Composite(BaseConfiguration):
     configurations: list[BaseConfiguration]
     weights: list[float]
 
