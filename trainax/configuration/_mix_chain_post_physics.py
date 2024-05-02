@@ -21,9 +21,9 @@ class MixChainPostPhysics(BaseConfiguration):
     def __init__(
         self,
         num_rollout_steps: int = 1,
+        num_post_physics_steps: int = 1,
         *,
         time_level_loss: BaseLoss = MSELoss(),
-        num_post_physics_steps: int = 1,
         cut_bptt: bool = False,
         cut_bptt_every: int = 1,
         time_level_weights: Optional[
