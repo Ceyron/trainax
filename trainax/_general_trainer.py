@@ -34,7 +34,7 @@ class GeneralTrainer(eqx.Module):
         callback_fn: Optional[BaseCallback] = None,
     ):
         """
-        Abstract training an autoregressive neural emulator on a collection of
+        Abstract training for an autoregressive neural emulator on a collection of
         trajectories.
 
         The length of (sub-)trajectories returned by `trajectory_sub_stacker` must
@@ -146,6 +146,12 @@ class GeneralTrainer(eqx.Module):
 
         Returns:
             Varying, see above.
+
+        Tipp:
+            You can use `equinox.filter_vmap` to train mulitple networks (of the
+                same architecture) at the same time. For example, if your GPU
+                is not fully utilized yet, this will give you a init-seed
+                statistic basically for free.
         """
         loss_history = []
         if self.callback_fn is not None:
