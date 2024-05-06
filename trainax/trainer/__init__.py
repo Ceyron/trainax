@@ -1,6 +1,7 @@
 """
 A trainer performs the optimization using a configuration with correct
-minibatching.
+minibatching. Internally, it combines a `BaseConfiguration` with the correctly
+set up `TrajectorySubStacker` and subclasses the `BaseTrainer`.
 """
 
 
