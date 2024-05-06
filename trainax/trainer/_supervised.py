@@ -71,9 +71,7 @@ class SupervisedTrainer(GeneralTrainer):
                 randomly sampled across both multiple trajectories, but also over
                 different windows within one trajectory. (keyword-only)
             num_rollout_steps (int): The number of time steps to
-                autoregressively roll out the model. During calling this
-                configuration, it requires an at least similarly long reference
-                trajectory to be available. Defaults to 1 (which is one-step
+                autoregressively roll out the model. Defaults to 1 (which is one-step
                 supervised training). (keyword-only argument)
             time_level_loss (BaseLoss): The loss function to use at
                 each time step. Defaults to MSELoss(). (keyword-only argument)
