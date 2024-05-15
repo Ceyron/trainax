@@ -1,4 +1,4 @@
-# Learning Methodologies for autoregressive neural operators
+# Trainax - Learning Methodologies for Autoregressive Neural Emulators 
 
 ![](https://ceyron.github.io/predictor-learning-setups/sup-3-none-true-full_gradient.svg)
 
