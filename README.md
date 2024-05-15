@@ -1,6 +1,12 @@
-# Trainax - Learning Methodologies for Autoregressive Neural Emulators 
+# Trainax
 
-![](https://ceyron.github.io/predictor-learning-setups/sup-3-none-true-full_gradient.svg)
+<p align="center">
+<b>Learning Methodologies for Autoregressive Neural Emulators</b>
+</p>
+
+<p align="center">
+    <img src="https://ceyron.github.io/predictor-learning-setups/sup-3-none-true-full_gradient.svg" width="400">
+</p>
 
 After the discretization of space and time, the simulation of a transient
 partial differential equation amounts to the repeated application of a
@@ -58,11 +64,6 @@ $$
 
 where $l$ is a **time-level loss**. In the easiest case $l = \text{MSE}$.
 
-### More
-
-Focus is clearly on the number of update steps, not on the number of epochs
-
-
 ### A taxonomy of learning setups
 
 The major axes that need to be chosen are:
@@ -108,7 +109,7 @@ There are three levels of hierarchy:
    diverted-chain, mix-chain, residuum). The most general diverted chain
    implementation contains supervised and branch-one diverted chain as special
    cases. See the section "Relation between Diverted Chain and Residuum
-   Training" for details how residuum training fits into the picture. All
+   Training" (TODO) for details how residuum training fits into the picture. All
    configurations allow setting additional constructor arguments to, e.g., cut
    the backpropagation through time (sparsely) or to supply time-level
    weightings (for example to exponentially discount contributions over long
@@ -119,4 +120,4 @@ There are three levels of hierarchy:
    combining the relevant configuration with the `GeneralTrainer` and a
    trajectory substacker.
 
-### Relation between Diverted Chain and Residuum Training
+You can find an overview of predictor learning setups [here](https://fkoehler.site/predictor-learning-setups/).
