@@ -20,7 +20,7 @@ class Loss(BaseCallback):
         with_grad: bool = False,
         ref_stepper: eqx.Module = None,
         residuum_fn: eqx.Module = None,
-        name: str
+        name: str,
     ):
         self.every = every
         self.loss_configuration = loss_configuration

@@ -30,7 +30,7 @@ class Composite(BaseConfiguration):
         data,
         *,
         ref_stepper: Module = None,
-        residuum_fn: Module = None
+        residuum_fn: Module = None,
     ) -> float:
         """
         Evaluate the composite configuration on the given data.
