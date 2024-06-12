@@ -1,57 +1,107 @@
-# Trainax
+<h1 align="center">
+  <img src="img/trainax_logo.png" width="400">
+  <br>
+    Trainax
+  <br>
+</h1>
 
 <p align="center">
-<b>Learning Methodologies for Autoregressive Neural Emulators</b>
+<b>Learning Methodologies for Autoregressive Neural Emulators.</b>
 </p>
 
 <p align="center">
-    <img src="https://ceyron.github.io/predictor-learning-setups/sup-3-none-true-full_gradient.svg" width="400">
+  <a href="#installation">Installation</a> •
+  <a href="#quickstart">Quickstart</a> •
+  <a href="#background">Background</a> •
+  <a href="#features">Features</a> •
+  <a href="#a-taxonomy-of-training-methodologies">Taxonomy</a> •
+  <a href="#license">License</a>
 </p>
 
-After the discretization of space and time, the simulation of a transient
-partial differential equation amounts to the repeated application of a
-simulation operator $\mathcal{P}$. Here, we are interested in
-imitating/emulating this physical/numerical operator with a neural network
-$f_\theta$. This repository is concerned with an abstract implementation of all
-ways we can frame a learning problem to inject "knowledge" from $\mathcal{P}$ to
-$f_\theta$.
+<p align="center">
+    <img src="img/sample_two_step_supervised.svg" width="400">
+</p>
 
-### Example
+## Installation
 
-Consider the 1d heat equation with periodic boundary conditions on the unit
-interval
-
-$$
-\begin{aligned}
-\partial_t u(x, t) &= \partial_{xx} u(x, t) \\
-u(0, t) &= u(1, t) \\
-\end{aligned}
-$$
-
-Discretizing the domain into $N$ degrees of freedom allows to find the
-forward-in-time central-in-space time stepper ([FTCS
-scheme](https://en.wikipedia.org/wiki/FTCS_scheme))
-
-$$
-u_i^{[t+1]} = u_i^{[t]} + \frac{\Delta t}{(\Delta x)^2} (u_{i+1}^{[t]} - 2 u_i^{[t]} + u_{i-1}^{[t]})
-$$
-
-which we can readily implement a simulation operator $\mathcal{P}$
-
-```python
-class FTCS:
-    dt: float = 0.001
-    dx: float = 0.01
-
-    def __call__(self, u):
-        u_next = u + self.dt / self.dx**2 * (np.roll(u, 1) - 2 * u + np.roll(u, -1))
-        return u_next
+Clone the repository, navigate to the folder and install the package with pip:
+```bash
+pip install .
 ```
 
-Now assume we have a distribution of initial conditions $\mathcal{Q}$ from which
-we sample $S$ initial conditions, $u^{[0]} \propto \mathcal{Q}$. Then, we can
-save them in an array of shape $(S, N)$ and repeatedly apply $\mathcal{P}$ to
-obtain the training trajectory of shape $(S, T+1, N)$.
+Requires Python 3.10+ and JAX 0.4.13+. 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+
+## Quickstart
+
+Train a kernel size 2 linear convolution (no bias) to become an emulator for the
+1D advection problem.
+
+```python
+import jax
+import jax.numpy as jnp
+import equinox as eqx
+import optax
+import trainax as tx
+
+CFL = -0.75
+
+ref_data = tx.sample_data.advection_1d_periodic(
+    cfl = CFL,
+    key = jax.random.PRNGKey(0),
+)
+
+linear_conv_kernel_2 = eqx.nn.Conv1d(
+    1, 1, 2,
+    padding="SAME", padding_mode="CIRCULAR", use_bias=False,
+    key=jax.random.PRNGKey(73)
+)
+
+sup_1_trainer, sup_5_trainer, sup_20_trainer = (
+    tx.trainer.SupervisedTrainer(
+        ref_data,
+        num_rollout_steps=r,
+        optimizer=optax.adam(1e-2),
+        num_training_steps=1000,
+        batch_size=32,
+    )
+    for r in (1, 5, 20)
+)
+
+sup_1_conv, sup_1_loss_history = sup_1_trainer(
+    linear_conv_kernel_2, key=jax.random.PRNGKey(42)
+)
+sup_5_conv, sup_5_loss_history = sup_5_trainer(
+    linear_conv_kernel_2, key=jax.random.PRNGKey(42)
+)
+sup_20_conv, sup_20_loss_history = sup_20_trainer(
+    linear_conv_kernel_2, key=jax.random.PRNGKey(42)
+)
+
+FOU_STENCIL = jnp.array([1+CFL, -CFL])
+
+print(jnp.linalg.norm(sup_1_conv.weight - FOU_STENCIL))   # 0.033
+print(jnp.linalg.norm(sup_5_conv.weight - FOU_STENCIL))   # 0.025
+print(jnp.linalg.norm(sup_20_conv.weight - FOU_STENCIL))  # 0.017
+```
+
+Increasing the supervised unrolling steps during training makes the learned
+stencil come closer to the numerical FOU stencil.
+
+## Background
+
+After the discretization of space and time, the simulation of a time-dependent
+partial differential equation amounts to the repeated application of a
+simulation operator $\mathcal{P}_h$. Here, we are interested in
+imitating/emulating this physical/numerical operator with a neural network
+$f_\theta$. This repository is concerned with an abstract implementation of all
+ways we can frame a learning problem to inject "knowledge" from $\mathcal{P}_h$
+into $f_\theta$.
+
+Assume we have a distribution of initial conditions $\mathcal{Q}$ from which we
+sample $S$ initial conditions, $u^{[0]} \propto \mathcal{Q}$. Then, we can save
+them in an array of shape $(S, C, *N)$ (with C channels and an arbitrary number
+of spatial axes of dimension N) and repeatedly apply $\mathcal{P}$ to obtain the
+training trajectory of shape $(S, T+1, C, *N)$.
 
 For a one-step supervised learning task, we substack the training trajectory
 into windows of size $2$ and merge the two leftover batch axes to get a data
@@ -64,11 +114,34 @@ $$
 
 where $l$ is a **time-level loss**. In the easiest case $l = \text{MSE}$.
 
-### A taxonomy of learning setups
+`Trainax` supports way more than just one-step supervised learning, e.g., to
+train with unrolled steps, to include the reference simulator $\mathcal{P}_h$ in
+training, train on residuum conditions instead of resolved reference states, cut
+and modify the gradient flow, etc.
+
+## Features
+
+* Wide collection of unrolled training methodologies:
+  * Supervised
+  * Diverted Chain
+  * Mix Chain
+  * Residuum
+* Based on [JAX](https://github.com/google/jax):
+  * One of the best Automatic Differentiation engines (forward & reverse)
+  * Automatic vectorization
+  * Backend-agnostic code (run on CPU, GPU, and TPU)
+* Build on top and compatible with [Equinox](https://github.com/patrick-kidger/equinox)
+* Batch-Parallel Training
+* Collection of Callbacks
+* Composability
+
+
+## A Taxonomy of Training Methodologies
 
 The major axes that need to be chosen are:
 
-* The rollout length (how often the network is applied autoregressively on the input)
+* The unrolled length (how often the network is applied autoregressively on the
+  input)
 * The branch length (how long the reference goes alongside the network; we get
   full supervised if that is as long as the rollout length)
 * Whether the physics is resolved (diverted-chain and supervised) or only given
@@ -99,19 +172,17 @@ There are three levels of hierarchy:
    latter. (In the schematic above, the time-level loss is the green circle).
 2. The `configuration` submodule devises how neural time stepper $f_\theta$
    (denoted *NN* in the schematic) interplays with the numerical simulator
-   $\mathcal{P}$. Similar to the time-level loss this is a callable PyTree which
-   requires during calling the neural stepper and some data. What this data
-   contains depends on the concrete configuration. For supervised rollout
+   $\mathcal{P}_h$. Similar to the time-level loss this is a callable PyTree
+   which requires during calling the neural stepper and some data. What this
+   data contains depends on the concrete configuration. For supervised rollout
    training it is the batch of (sub-) trajectories to be considered. Other
    configurations might also require the reference stepper or a two consecutive
    time level based residuum function. Each configuration is essentially an
    abstract implementation of the major methodologies (supervised,
    diverted-chain, mix-chain, residuum). The most general diverted chain
    implementation contains supervised and branch-one diverted chain as special
-   cases. See the section "Relation between Diverted Chain and Residuum
-   Training" (TODO) for details how residuum training fits into the picture. All
-   configurations allow setting additional constructor arguments to, e.g., cut
-   the backpropagation through time (sparsely) or to supply time-level
+   cases. All configurations allow setting additional constructor arguments to,
+   e.g., cut the backpropagation through time (sparsely) or to supply time-level
    weightings (for example to exponentially discount contributions over long
    rollouts).
 3. The `training` submodule combines a configuration together with stochastic
@@ -120,4 +191,16 @@ There are three levels of hierarchy:
    combining the relevant configuration with the `GeneralTrainer` and a
    trajectory substacker.
 
-You can find an overview of predictor learning setups [here](https://fkoehler.site/predictor-learning-setups/).
+You can find an overview of predictor learning setups
+[here](https://fkoehler.site/predictor-learning-setups/).
+
+## License
+
+MIT, see [here](LICENSE.txt)
+
+---
+
+> [fkoehler.site](https://fkoehler.site/) &nbsp;&middot;&nbsp;
+> GitHub [@ceyron](https://github.com/ceyron) &nbsp;&middot;&nbsp;
+> X [@felix_m_koehler](https://twitter.com/felix_m_koehler)
+
