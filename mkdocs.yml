@@ -1,0 +1,114 @@
+site_name: Trainax
+site_description: Training Methodologies for Autoregressive Neural Emulators in JAX.
+site_author: Felix Koehler
+site_url: https://fkoehler.site/trainax
+
+repo_url: https://github.com/Ceyron/trainax
+repo_name: Ceyron/trainax
+edit_uri: ""  # No edit button, as some of our pages are in /docs and some in /examples via symlink, so it's impossible for them all to be accurate
+
+theme:
+    name: material
+    features:
+        - navigation.sections  # Sections are included in the navigation on the left.
+        - toc.integrate  # Table of contents is integrated on the left; does not appear separately on the right.
+        - header.autohide  # header disappears as you scroll
+    palette:
+        - scheme: default
+          primary: red
+          accent: amber
+          toggle:
+             icon: material/weather-night
+             name: Switch to dark mode
+        - scheme: slate
+          primary: red
+          accent: amber
+          toggle:
+             icon: material/weather-sunny
+             name: Switch to light mode
+    icon:
+        repo: fontawesome/brands/github  # GitHub logo in top right
+        logo: fontawesome/solid/syringe
+    favicon: "imgs/syringe-solid.png"
+
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/felix_m_koehler
+    - icon: fontawesome/brands/github
+      link: https://github.com/ceyron
+    - icon: fontawesome/brands/youtube
+      link: https://youtube.com/@MachineLearningSimulation
+
+
+strict: true  # Don't allow warnings during the build process
+
+markdown_extensions:
+    - pymdownx.arithmatex:  # Render LaTeX via MathJax
+        generic: true
+    - pymdownx.superfences  # Seems to enable syntax highlighting when used with the Material theme.
+    - pymdownx.details  # Allowing hidden expandable regions denoted by ???
+    - pymdownx.snippets:  # Include one Markdown file into another
+        base_path: docs
+    - admonition
+    - toc:
+        permalink: "¤"  # Adds a clickable permalink to each section heading
+        toc_depth: 4
+    - pymdownx.arithmatex:
+        generic: true
+
+extra_javascript:
+    - javascripts/mathjax.js
+    - https://polyfill.io/v3/polyfill.min.js?features=es6
+    - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+plugins:
+    - search  # default search plugin; needs manually re-enabling when using any other plugins
+    - autorefs  # Cross-links to headings
+    - mknotebooks  # Jupyter notebooks
+    - mkdocstrings:
+        handlers:
+            python:
+                options:
+                    inherited_members: true  # Allow looking up inherited methods
+                    show_root_heading: true  # actually display anything at all...
+                    show_root_full_path: true  # display "diffrax.asdf" not just "asdf"
+                    show_if_no_docstring: true
+                    show_signature_annotations: true
+                    separate_signature: true
+                    show_source: true  # don't include source code
+                    members_order: source  # order methods according to their order of definition in the source code, not alphabetical order
+                    heading_level: 4
+                    show_symbol_type_heading: true
+                    docstring_style: null
+
+nav:
+    - 'index.md'
+    - Examples:
+        - Introductory:
+            - FOU one step learning is convex: 'examples/FOU_one_step_learning_is_convex.ipynb'
+            - Configuration showcase: 'examples/configuration_showcase.ipynb'
+        - Advanced:
+            - Using Callbacks: 'examples/using_callbacks.ipynb'
+    - High-Level API:
+        - Trainer:
+            - Supervised: 'api/trainer/supervised.md'
+            - Diverted Chain: 'api/trainer/diverted_chain.md'
+            - Mixed Chain: 'api/trainer/mixed_chain.md'
+            - Residuum: 'api/trainer/residuum.md'
+        - Callbacks: 'api/callbacks.md'
+        - Sample Data: 'api/sample_data.md'
+    - Low-Level API:
+        - General Trainer: 'api/general_trainer.md'
+        - Trajectory Mixing: 'api/trajectory_mixing.md'
+        - Configuration:
+            - Supervised: 'api/configuration/supervised.md'
+            - Diverted Chain: 'api/configuration/diverted_chain.md'
+            - Mix Chain: 'api/configuration/mix_chain.md'
+            - Residuum: 'api/configuration/residuum.md'
+            - Composite: 'api/configuration/composite.md'
+            - Base: 'api/configuration/base.md'
+        - Loss: 'api/loss.md'
+    - Background:
+        - Background:
+            - Relate Div and Res: 'background/relation_diverted_chain_and_residuum.md'

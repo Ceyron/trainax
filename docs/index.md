@@ -1,5 +1,7 @@
+# Getting started
+
 <h1 align="center">
-  <img src="docs/imgs/trainax_logo.png" width="400">
+  <img src="imgs/trainax_logo.png" width="400">
   <br>
     Trainax
   <br>
@@ -19,7 +21,7 @@
 </p>
 
 <p align="center">
-    <img src="docs/imgs/sample_two_step_supervised.svg" width="400">
+    <img src="imgs/sample_two_step_supervised.svg" width="400">
 </p>
 
 ## Installation
@@ -196,11 +198,10 @@ You can find an overview of predictor learning setups
 
 ## License
 
-MIT, see [here](LICENSE.txt)
+MIT, see [here](https://github.com/Ceyron/trainax/blob/main/LICENSE.txt)
 
 ---
 
 > [fkoehler.site](https://fkoehler.site/) &nbsp;&middot;&nbsp;
 > GitHub [@ceyron](https://github.com/ceyron) &nbsp;&middot;&nbsp;
 > X [@felix_m_koehler](https://twitter.com/felix_m_koehler)
-
