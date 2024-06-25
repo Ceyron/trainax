@@ -95,3 +95,13 @@ nav:
             - Mixed Chain: 'api/trainer/mixed_chain.md'
             - Residuum: 'api/trainer/residuum.md'
         - Callbacks: 'api/callbacks.md'
+    - Low-Level API:
+        - General Trainer: 'api/general_trainer.md'
+        - Trajectory Mixing: 'api/trajectory_mixing.md'
+        - Configuration:
+            - Supervised: 'api/configuration/supervised.md'
+            - Diverted Chain: 'api/configuration/diverted_chain.md'
+            - Mix Chain: 'api/configuration/mix_chain.md'
+            - Residuum: 'api/configuration/residuum.md'
+            - Composite: 'api/configuration/composite.md'
+        - Loss: 'api/loss.md'
