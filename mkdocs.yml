@@ -105,4 +105,5 @@ nav:
             - Mix Chain: 'api/configuration/mix_chain.md'
             - Residuum: 'api/configuration/residuum.md'
             - Composite: 'api/configuration/composite.md'
+            - Base: 'api/configuration/base.md'
         - Loss: 'api/loss.md'

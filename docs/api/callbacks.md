@@ -39,3 +39,10 @@
     options:
         members:
             - __init__
+
+---
+
+::: trainax.callback.BaseCallback
+    options:
+        members:
+            - __init__
