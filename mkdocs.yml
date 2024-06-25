@@ -109,3 +109,6 @@ nav:
             - Composite: 'api/configuration/composite.md'
             - Base: 'api/configuration/base.md'
         - Loss: 'api/loss.md'
+    - Background:
+        - Background:
+            - Relate Div and Res: 'background/relation_diverted_chain_and_residuum.md'
