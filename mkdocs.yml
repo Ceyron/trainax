@@ -82,3 +82,9 @@ plugins:
 
 nav:
     - 'index.md'
+    - Examples:
+        - Introductory:
+            - FOU one step learning is convex: 'examples/FOU_one_step_learning_is_convex.ipynb'
+            - Configuration showcase: 'examples/configuration_showcase.ipynb'
+        - Advanced:
+            - Using Callbacks: 'examples/using_callbacks.ipynb'
