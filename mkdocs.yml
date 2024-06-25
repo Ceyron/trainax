@@ -28,6 +28,8 @@ theme:
              name: Switch to light mode
     icon:
         repo: fontawesome/brands/github  # GitHub logo in top right
+        logo: fontawesome/solid/syringe
+    favicon: "imgs/syringe-solid.png"
 
 extra:
   social:
