@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="img/trainax_logo.png" width="400">
+  <img src="docs/imgs/trainax_logo.png" width="400">
   <br>
     Trainax
   <br>
@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-    <img src="img/sample_two_step_supervised.svg" width="400">
+    <img src="docs/imgs/sample_two_step_supervised.svg" width="400">
 </p>
 
 ## Installation
