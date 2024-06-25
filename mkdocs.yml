@@ -88,9 +88,10 @@ nav:
             - Configuration showcase: 'examples/configuration_showcase.ipynb'
         - Advanced:
             - Using Callbacks: 'examples/using_callbacks.ipynb'
-    - API:
+    - High-Level API:
         - Trainer:
             - Supervised: 'api/trainer/supervised.md'
             - Diverted Chain: 'api/trainer/diverted_chain.md'
             - Mixed Chain: 'api/trainer/mixed_chain.md'
             - Residuum: 'api/trainer/residuum.md'
+        - Callbacks: 'api/callbacks.md'
