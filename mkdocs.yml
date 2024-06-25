@@ -95,6 +95,7 @@ nav:
             - Mixed Chain: 'api/trainer/mixed_chain.md'
             - Residuum: 'api/trainer/residuum.md'
         - Callbacks: 'api/callbacks.md'
+        - Sample Data: 'api/sample_data.md'
     - Low-Level API:
         - General Trainer: 'api/general_trainer.md'
         - Trajectory Mixing: 'api/trajectory_mixing.md'
