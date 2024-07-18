@@ -17,18 +17,20 @@ class BaseConfiguration(eqx.Module, ABC):
         """
         Evaluate the configuration on the given data.
 
-        Args:
-            stepper (eqx.Module): The stepper to use for the configuration. Must
-                have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
-            data (PyTree): The data to evaluate the configuration on. This
-                depends on the concrete configuration. In the most reduced case,
-                it just contains the set of initial states.
-            ref_stepper (eqx.Module): The reference stepper to use for some
-                configurations. (keyword-only argument)
-            residuum_fn (eqx.Module): The residuum function to use for some
-                configurations. (keyword-only argument)
+        **Arguments:**
 
-        Returns:
-            float: The loss value computed by this configuration.
+        - `stepper`: The stepper to use for the configuration. Must
+            have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
+        - `data`: The data to evaluate the configuration on. This
+            depends on the concrete configuration. In the most reduced case,
+            it just contains the set of initial states.
+        - `ref_stepper`: The reference stepper to use for some
+            configurations. (keyword-only argument)
+        - `residuum_fn`: The residuum function to use for some
+            configurations. (keyword-only argument)
+
+        **Returns:**
+
+        - The loss value computed by this configuration.
         """
         pass
