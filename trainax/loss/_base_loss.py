@@ -11,6 +11,7 @@ class BaseLoss(eqx.Module, ABC):
     batch_reduction: Callable
 
     def __init__(self, *, batch_reduction: Callable = jnp.mean):
+        """Base class for loss functions."""
         self.batch_reduction = batch_reduction
 
     @abstractmethod
