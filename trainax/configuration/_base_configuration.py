@@ -22,8 +22,8 @@ class BaseConfiguration(eqx.Module, ABC):
         - `stepper`: The stepper to use for the configuration. Must
             have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
         - `data`: The data to evaluate the configuration on. This
-            depends on the concrete configuration. In the most reduced case,
-            it just contains the set of initial states.
+            depends on the concrete configuration. In the most reduced case, it
+            just contains the set of initial states.
         - `ref_stepper`: The reference stepper to use for some
             configurations. (keyword-only argument)
         - `residuum_fn`: The residuum function to use for some
