@@ -19,6 +19,27 @@ class BaseLoss(eqx.Module, ABC):
         prediction: Float[Array, "num_channels ..."],
         target: Optional[Float[Array, "num_channels ..."]] = None,
     ) -> float:
+        """
+        Evaluate the loss for a single sample.
+
+        Inputs must be PyTrees of identical structure with array leafs having at
+        least a channel/feature axis, and optionally one or more subsequent axes
+        (e.g., spatial axes). There should be **no batch axis**.
+
+        !!! info
+
+            To operate on a batch of inputs, either use `multi_batch` or use
+            `jax.vmap` on this method.
+
+        **Arguments:**
+
+        - `prediction`: The predicted values.
+        - `target`: The target values.
+
+        **Returns:**
+
+        - The loss value.
+        """
         pass
 
     def multi_batch(
@@ -26,6 +47,24 @@ class BaseLoss(eqx.Module, ABC):
         prediction: Float[Array, "num_batches num_channels ..."],
         target: Optional[Float[Array, "num_batches num_channels ..."]] = None,
     ) -> float:
+        """
+        Evaluate the loss for a batch of samples.
+
+        Inputs must be PyTrees of identical structure with array leafs having a
+        leading batch axis, a subsequent channel/feature axis, and optionally one
+        or more subsequent axes (e.g., spatial axes).
+
+        Uses the batch aggregator function specified during initialization.
+
+        **Arguments:**
+
+        - `prediction`: The predicted values.
+        - `target`: The target values.
+
+        **Returns:**
+
+        - The loss value.
+        """
         if target is None:
             return self.batch_reduction(
                 jax.vmap(
@@ -46,4 +85,22 @@ class BaseLoss(eqx.Module, ABC):
         prediction: Float[Array, "num_batches num_channels ..."],
         target: Optional[Float[Array, "num_batches num_channels ..."]] = None,
     ) -> float:
+        """
+        Evaluate the loss for a batch of samples.
+
+        Inputs must be PyTrees of identical structure with array leafs having a
+        leading batch axis, a subsequent channel/feature axis, and optionally one
+        or more subsequent axes (e.g., spatial axes).
+
+        Uses the batch aggregator function specified during initialization.
+
+        **Arguments:**
+
+        - `prediction`: The predicted values.
+        - `target`: The target values.
+
+        **Returns:**
+
+        - The loss value.
+        """
         return self.multi_batch(prediction, target)
