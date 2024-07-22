@@ -15,11 +15,10 @@ class Composite(BaseConfiguration):
         """
         Compose configurations with respective weights.
 
-        Args:
-            configurations (list[BaseConfiguration]): The list of configurations
-                to compose.
-            weights (list[float]): The list of weights to apply to the
-                configurations.
+        **Arguments:**
+
+        - `configurations`: The list of configurations to compose.
+        - `weights`: The list of weights to apply to the configurations.
         """
         self.configurations = configurations
         self.weights = weights
@@ -38,20 +37,21 @@ class Composite(BaseConfiguration):
         Based on the underlying configurations, `ref_stepper` or `residuum_fn`
         or both have to be supplied (as keyword-only arguments).
 
-        Args:
-            stepper (Module): The stepper to use for the configuration. Must
-                have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
-            data (PyTree): The data to evaluate the configuration on. This
-                depends on the concrete configuration. In the most reduced case,
-                it just contains the set of initial states.
-            ref_stepper (Module): The reference stepper to use for some
-                configurations. Defaults to None.
-            residuum_fn (Module): The residuum function to use for some
-                configurations. Defaults to None.
+        **Arguments:**
 
-        Returns:
-            float: The loss value computed by all configurations combined and
-                weighted.
+        - `stepper`: The stepper to use for the configuration. Must
+            have the signature `stepper(u_prev: PyTree) -> u_next: PyTree`.
+        - `data`: The data to evaluate the configuration on. This
+            depends on the concrete configuration. In the most reduced case, it
+            just contains the set of initial states.
+        - `ref_stepper`: The reference stepper to use for some
+            configurations.
+        - `residuum_fn`: The residuum function to use for some
+            configurations.
+
+        **Returns:**
+
+        - The loss value computed by all configurations combined and weighted.
         """
         loss = sum(
             weight
