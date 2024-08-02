@@ -136,6 +136,7 @@ class GeneralTrainer(eqx.Module):
         *,
         return_loss_history: bool = True,
         record_loss_every: int = 1,
+        spawn_tqdm: bool = True,
     ) -> Union[
         tuple[eqx.Module, Float[Array, "num_minibatches"]],
         eqx.Module,
@@ -145,9 +146,6 @@ class GeneralTrainer(eqx.Module):
         """
         Perform the entire training of an autoregressive neural emulator given
         in an initial state as `stepper`.
-
-        This method spawns a `tqdm` progress meter showing the current update
-        step and displaying the epoch with its respetive minibatch counter.
 
         This method's return signature depends on the presence of a callback
         function. If a callback function is provided, this function has at max
@@ -169,6 +167,9 @@ class GeneralTrainer(eqx.Module):
         - `return_loss_history`: Whether to return the loss history.
         - `record_loss_every`: Record the loss every `record_loss_every`
             minibatches. Defaults to 1, i.e., record every minibatch.
+        - `spawn_tqdm`: Whether to spawn the tqdm progress meter showing the
+            current update step and displaying the epoch with its respetive
+            minibatch counter.
 
         **Returns:**
 
@@ -192,10 +193,11 @@ class GeneralTrainer(eqx.Module):
             shuffle_key=key,
         )
 
-        p_meter = tqdm(
-            total=self.num_minibatches,
-            desc=f"E: {0:05d}, B: {0:05d}",
-        )
+        if spawn_tqdm:
+            p_meter = tqdm(
+                total=self.num_minibatches,
+                desc=f"E: {0:05d}, B: {0:05d}",
+            )
 
         update_fn = eqx.filter_jit(self.step_fn)
 
@@ -214,13 +216,15 @@ class GeneralTrainer(eqx.Module):
             )
             if update_i % record_loss_every == 0:
                 loss_history.append(loss)
-            p_meter.update(1)
+            if spawn_tqdm:
+                p_meter.update(1)
 
-            p_meter.set_description(
-                f"E: {expoch_id:05d}, B: {batch_id:05d}",
-            )
+                p_meter.set_description(
+                    f"E: {expoch_id:05d}, B: {batch_id:05d}",
+                )
 
-        p_meter.close()
+        if spawn_tqdm:
+            p_meter.close()
 
         loss_history = jnp.array(loss_history)
 
