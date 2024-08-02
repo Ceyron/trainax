@@ -133,6 +133,18 @@ def _lorenz_rhs(
     return jnp.array([x_dot, y_dot, z_dot])
 
 
+def make_lorenz_stepper_rk4(
+    dt: float = 0.05,
+    *,
+    sigma: float = 10.0,
+    rho: float = 28.0,
+    beta: float = 8.0 / 3.0,
+):
+    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+    return lorenz_stepper
+
+
 def lorenz_rk4(
     num_samples: int = 20,
     *,
@@ -184,8 +196,10 @@ def lorenz_rk4(
 
     u_0_set = jax.random.normal(key, shape=(num_samples, 3)) * init_std
 
-    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
-    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+    # lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    # lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+
+    lorenz_stepper = make_lorenz_stepper_rk4(dt=dt, sigma=sigma, rho=rho, beta=beta)
 
     def scan_fn(u, _):
         u_next = lorenz_stepper(u)
