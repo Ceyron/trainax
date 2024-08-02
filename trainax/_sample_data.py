@@ -109,9 +109,9 @@ def advection_1d_periodic(
 
 def _step_rk4(
     fn: Callable,
-    u_init: Float[Array, ...],
+    u_init: Float[Array, "dof ..."],
     dt: float,
-):
+) -> Float[Array, "dof ..."]:
     k1 = fn(u_init)
     k2 = fn(u_init + 0.5 * dt * k1)
     k3 = fn(u_init + 0.5 * dt * k2)
