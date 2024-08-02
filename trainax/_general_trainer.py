@@ -132,6 +132,7 @@ class GeneralTrainer(eqx.Module):
         self,
         stepper: eqx.Module,
         key: PRNGKeyArray,
+        opt_state: Optional[optax.OptState] = None,
         *,
         return_loss_history: bool = True,
         record_loss_every: int = 1,
@@ -163,6 +164,8 @@ class GeneralTrainer(eqx.Module):
 
         - `stepper`: The equinox Module to be trained.
         - `key`: The random key to be used for shuffling the minibatches.
+        - `opt_state`: The initial optimizer state. Defaults to None, meaning
+            the optimizer will be reinitialized.
         - `return_loss_history`: Whether to return the loss history.
         - `record_loss_every`: Record the loss every `record_loss_every`
             minibatches. Defaults to 1, i.e., record every minibatch.
@@ -197,7 +200,8 @@ class GeneralTrainer(eqx.Module):
         update_fn = eqx.filter_jit(self.step_fn)
 
         trained_stepper = stepper
-        opt_state = self.optimizer.init(eqx.filter(trained_stepper, eqx.is_array))
+        if opt_state is None:
+            opt_state = self.optimizer.init(eqx.filter(trained_stepper, eqx.is_array))
 
         for update_i in range(self.num_minibatches):
             batch_indices, (expoch_id, batch_id) = mixer(update_i, return_info=True)
