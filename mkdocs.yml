@@ -86,6 +86,7 @@ nav:
     - 'index.md'
     - Examples:
         - Introductory:
+            - Lorenz Emulator: 'examples/lorenz_emulator.ipynb'
             - FOU one step learning is convex: 'examples/FOU_one_step_learning_is_convex.ipynb'
             - Configuration showcase: 'examples/configuration_showcase.ipynb'
         - Advanced:

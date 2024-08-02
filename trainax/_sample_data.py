@@ -1,3 +1,5 @@
+from typing import Callable
+
 import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
@@ -103,3 +105,101 @@ def advection_1d_periodic(
     u_trj_with_singleton_channel = u_trj[..., None, :]
 
     return u_trj_with_singleton_channel
+
+
+def _step_rk4(
+    fn: Callable,
+    u_init: Float[Array, "dof ..."],
+    dt: float,
+) -> Float[Array, "dof ..."]:
+    k1 = fn(u_init)
+    k2 = fn(u_init + 0.5 * dt * k1)
+    k3 = fn(u_init + 0.5 * dt * k2)
+    k4 = fn(u_init + dt * k3)
+    return u_init + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+
+
+def _lorenz_rhs(
+    u: Float[Array, "3"],
+    *,
+    sigma: float,
+    rho: float,
+    beta: float,
+) -> Float[Array, "3"]:
+    x, y, z = u
+    x_dot = sigma * (y - x)
+    y_dot = x * (rho - z) - y
+    z_dot = x * y - beta * z
+    return jnp.array([x_dot, y_dot, z_dot])
+
+
+def lorenz_rk4(
+    num_samples: int = 20,
+    *,
+    temporal_horizon: int = 1000,
+    dt: float = 0.05,
+    num_warmup_steps: int = 500,
+    sigma: float = 10.0,
+    rho: float = 28.0,
+    beta: float = 8.0 / 3.0,
+    init_std: float = 1.0,
+    key: PRNGKeyArray,
+) -> Float[Array, "num_samples temporal_horizon 3"]:
+    r"""
+    Produces reference trajectories of the simple three-equation Lorenz system
+    when integrated with a fixed-size Runge-Kutta 4th order scheme.
+
+    $$
+    \begin{aligned}
+    \frac{dx}{dt} &= \sigma (y - x) \\
+    \frac{dy}{dt} &= x (\rho - z) - y \\
+    \frac{dz}{dt} &= x y - \beta z
+    \end{aligned}
+    $$
+
+    The initial conditions are drawn from a standard normal distribution for
+    each of the three variables with a prescribed standard deviation (mean is
+    zero).
+
+    **Arguments**:
+
+    - `num_samples`: The number of samples to generate, i.e., how many different
+        trajectories.
+    - `temporal_horizon`: The number of timesteps to simulate.
+    - `dt`: The timestep size. Depending on the values of `sigma`, `rho`, and
+        `beta`, the system might be hard to integrate. Usually, a time step
+        $\Delta t \in [0.01, 0.1]$ is a good choice.
+    - `num_warmup_steps`: The number of steps to discard from the beginning of
+        the trajectory.
+    - `sigma`: The $\sigma$ parameter of the Lorenz system.
+    - `rho`: The $\rho$ parameter of the Lorenz system.
+    - `beta`: The $\beta$ parameter of the Lorenz system.
+    - `init_std`: The standard deviation of the initial conditions.
+    - `key`: The random key.
+
+    **Returns**:
+
+    - A tensor of shape `(num_samples, temporal_horizon, 3)`.
+    """
+
+    u_0_set = jax.random.normal(key, shape=(num_samples, 3)) * init_std
+
+    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+
+    def scan_fn(u, _):
+        u_next = lorenz_stepper(u)
+        return u_next, u
+
+    def rollout(init):
+        _, u_trj = jax.lax.scan(
+            scan_fn, init, None, length=temporal_horizon + num_warmup_steps
+        )
+        return u_trj
+
+    trj_set = jax.vmap(rollout)(u_0_set)
+
+    # Slice away the warmup steps
+    trj_set = trj_set[:, num_warmup_steps:]
+
+    return trj_set
