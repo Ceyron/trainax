@@ -1,3 +1,5 @@
+from typing import Callable
+
 import jax
 import jax.numpy as jnp
 from jaxtyping import Array, Float, PRNGKeyArray
@@ -103,3 +105,72 @@ def advection_1d_periodic(
     u_trj_with_singleton_channel = u_trj[..., None, :]
 
     return u_trj_with_singleton_channel
+
+
+def _step_rk4(
+    fn: Callable,
+    u_init: Float[Array, ...],
+    dt: float,
+):
+    k1 = fn(u_init)
+    k2 = fn(u_init + 0.5 * dt * k1)
+    k3 = fn(u_init + 0.5 * dt * k2)
+    k4 = fn(u_init + dt * k3)
+    return u_init + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
+
+
+def _lorenz_rhs(
+    u: Float[Array, "3"],
+    *,
+    sigma: float,
+    rho: float,
+    beta: float,
+) -> Float[Array, "3"]:
+    x, y, z = u
+    x_dot = sigma * (y - x)
+    y_dot = x * (rho - z) - y
+    z_dot = x * y - beta * z
+    return jnp.array([x_dot, y_dot, z_dot])
+
+
+def lorenz_rk4(
+    num_samples: int = 20,
+    *,
+    temporal_horizon: int = 100,
+    dt: float = 0.05,
+    num_warmup_steps: int = 500,
+    sigma: float = 10.0,
+    rho: float = 28.0,
+    beta: float = 8.0 / 3.0,
+    key: PRNGKeyArray,
+) -> Float[Array, "num_samples temporal_horizon 3"]:
+    """
+    Produces reference trajectories of the simple three-equation Lorenz system
+    when integrated with a fixed-size Runge-Kutta 4th order scheme.
+
+    The initial conditions are drawn from a standard normal distribution for
+    each of the three variables with a prescribed standard deviation (mean is
+    zero).
+    """
+
+    u_0_set = jax.random.normal(key, shape=(num_samples, 3))
+
+    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+
+    def scan_fn(u, _):
+        u_next = lorenz_stepper(u)
+        return u_next, u
+
+    def rollout(init):
+        _, u_trj = jax.lax.scan(
+            scan_fn, init, None, length=temporal_horizon + num_warmup_steps
+        )
+        return u_trj
+
+    trj_set = jax.vmap(rollout)(u_0_set)
+
+    # Slice away the warmup steps
+    trj_set = trj_set[:, num_warmup_steps:]
+
+    return trj_set
