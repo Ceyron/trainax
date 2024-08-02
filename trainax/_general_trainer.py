@@ -102,7 +102,7 @@ class GeneralTrainer(eqx.Module):
         self,
         stepper: eqx.Module,
         opt_state: optax.OptState,
-        data: PyTree[float[Array, "batch_size sub_trj_len ..."]],
+        data: PyTree[Float[Array, "batch_size sub_trj_len ..."]],
     ) -> tuple[eqx.Module, optax.OptState, float]:
         """
         Perform a single update step to the `stepper`'s parameters.
