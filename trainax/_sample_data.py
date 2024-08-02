@@ -142,18 +142,47 @@ def lorenz_rk4(
     sigma: float = 10.0,
     rho: float = 28.0,
     beta: float = 8.0 / 3.0,
+    init_std: float = 1.0,
     key: PRNGKeyArray,
 ) -> Float[Array, "num_samples temporal_horizon 3"]:
-    """
+    r"""
     Produces reference trajectories of the simple three-equation Lorenz system
     when integrated with a fixed-size Runge-Kutta 4th order scheme.
+
+    $$
+    \begin{aligned}
+    \frac{dx}{dt} &= \sigma (y - x) \\
+    \frac{dy}{dt} &= x (\rho - z) - y \\
+    \frac{dz}{dt} &= x y - \beta z
+    \end{aligned}
+    $$
 
     The initial conditions are drawn from a standard normal distribution for
     each of the three variables with a prescribed standard deviation (mean is
     zero).
+
+    **Arguments**:
+
+    - `num_samples`: The number of samples to generate, i.e., how many different
+        trajectories.
+    - `temporal_horizon`: The number of timesteps to simulate.
+    - `dt`: The timestep size. Depending on the values of `sigma`, `rho`, and
+        `beta`, the system might be hard to integrate. Usually, a time step
+        $\Delta t \in [0.01, 0.1]$ is a good choice.
+    - `num_warmup_steps`: The number of steps to discard from the beginning of
+        the trajectory.
+    - `sigma`: The $\sigma$ parameter of the Lorenz system.
+    - `rho`: The $\rho$ parameter of the Lorenz system.
+    - `beta`: The $\beta$ parameter of the Lorenz system.
+    - `init_std`: The standard deviation of the initial conditions.
+    - `key`: The random key.
+
+    **Returns**:
+
+    - A tensor of shape `(num_samples, temporal_horizon, 3)`.
     """
 
-    u_0_set = jax.random.normal(key, shape=(num_samples, 3))
+    u_0_set = jax.random.normal(key, shape=(num_samples, 3)) * init_std
 
     lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
     lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
