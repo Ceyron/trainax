@@ -9,6 +9,10 @@ from ._base import BaseCallback
 class CompositeCallback(eqx.Module):
     callbacks: list[BaseCallback]
 
+    def __init__(self, callbacks: list[BaseCallback]):
+        """Callback to combine multiple callbacks."""
+        self.callbacks = callbacks
+
     def __call__(
         self,
         update_i: int,

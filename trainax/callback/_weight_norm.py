@@ -10,9 +10,17 @@ class WeightNorm(BaseCallback):
     squared: bool = False
 
     def __init__(self, every: int, squared: bool = False, name: str = "weight_norm"):
-        self.every = every
+        """
+        Callback to save the weight norm `every` update steps.
+
+        **Arguments:**
+
+        - `every`: The frequency of the callback.
+        - `squared`: Whether to return the squared weight norm.
+        - `name`: The name of the callback
+        """
         self.squared = squared
-        self.name = name
+        super().__init__(every, name)
 
     def callback(
         self,
