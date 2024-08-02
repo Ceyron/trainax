@@ -136,7 +136,7 @@ def _lorenz_rhs(
 def lorenz_rk4(
     num_samples: int = 20,
     *,
-    temporal_horizon: int = 100,
+    temporal_horizon: int = 1000,
     dt: float = 0.05,
     num_warmup_steps: int = 500,
     sigma: float = 10.0,
