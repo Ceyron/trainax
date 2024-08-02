@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, Union
 
 import equinox as eqx
 import jax.numpy as jnp
 import optax
-from jaxtyping import PRNGKeyArray, PyTree
+from jaxtyping import Array, Float, PRNGKeyArray, PyTree
 from tqdm.autonotebook import tqdm
 
 from ._mixer import PermutationMixer, TrajectorySubStacker
@@ -34,31 +34,35 @@ class GeneralTrainer(eqx.Module):
         callback_fn: Optional[BaseCallback] = None,
     ):
         """
-        Abstract training for an autoregressive neural emulator on a collection of
-        trajectories.
+        Abstract training for an autoregressive neural emulator on a collection
+        of trajectories.
 
-        The length of (sub-)trajectories returned by `trajectory_sub_stacker` must
-        match the requires length of reference for the used `loss_configuration`.
+        !!! info
+            The length of (sub-)trajectories returned by
+            `trajectory_sub_stacker` must match the required length of reference
+            for the used `loss_configuration`.
 
-        Args:
-            trajectory_sub_stacker (TrajectorySubStacker): A callable that takes a
-                list of indices and returns a collection of (sub-)trajectories.
-            loss_configuration (BaseConfiguration): A configuration that defines the
-                loss function to be minimized.
-            ref_stepper (eqx.Module, optional): A reference stepper that is used to
-                compute the residuum. Supply this if the loss configuration requires
-                a reference stepper. Defaults to None.
-            residuum_fn (eqx.Module, optional): A residuum function that computes the
-                discrete residuum between two consecutive states. Supply this if the
-                loss configuration requires a residuum function. Defaults to None.
-            optimizer (optax.GradientTransformation): An optimizer that updates the
-                parameters of the stepper given the gradient.
-            num_minibatches (int): The number of minibatches to train on. This equals
-                the total number of update steps performed. The number of epochs is
-                determined based on this and the `batch_size`.
-            batch_size (int): The size of each batch.
-            callback_fn (BaseCallback, optional): A callback function that is called
-                at the end of each minibatch. Defaults to None.
+        **Arguments:**
+
+        - `trajectory_sub_stacker`: A callable that takes a
+            list of indices and returns a collection of (sub-)trajectories.
+        - `loss_configuration`: A configuration that defines the
+            loss function to be minimized.
+        - `ref_stepper`: A reference stepper that is used to
+            compute the residuum. Supply this if the loss configuration requires
+            a reference stepper.
+        - `residuum_fn`: A residuum function that computes the
+            discrete residuum between two consecutive states. Supply this if the
+            loss configuration requires a residuum function. Defaults to None.
+        - `optimizer`: An optimizer that updates the
+            parameters of the stepper given the gradient.
+        - `num_minibatches`: The number of minibatches to train on. This equals
+            the total number of update steps performed. The number of epochs is
+            automatically determined based on this and the `batch_size`.
+        - `batch_size`: The size of each minibatch, i.e., how many samples are
+            included within.
+        - `callback_fn`: A callback function that is called
+            at the end of each minibatch. Defaults to None.
         """
         self.trajectory_sub_stacker = trajectory_sub_stacker
         self.loss_configuration = loss_configuration
@@ -75,6 +79,17 @@ class GeneralTrainer(eqx.Module):
     ) -> float:
         """
         Compute the loss on the entire dataset.
+
+        !!! warning
+            This can lead to out of memory errors if the dataset is too large.
+
+        **Arguments:**
+
+        - `stepper`: The stepper to compute the loss with.
+
+        **Returns:**
+
+        - The loss value.
         """
         return self.loss_configuration(
             stepper,
@@ -87,19 +102,22 @@ class GeneralTrainer(eqx.Module):
         self,
         stepper: eqx.Module,
         opt_state: optax.OptState,
-        data: PyTree,
+        data: PyTree[float[Array, "batch_size sub_trj_len ..."]],
     ) -> tuple[eqx.Module, optax.OptState, float]:
         """
         Perform a single update step to the `stepper`'s parameters.
 
-        Args:
-            stepper (eqx.Module): The stepper to be updated.
-            opt_state (optax.OptState): The optimizer state.
-            data (PyTree): The data for the current minibatch.
+        **Arguments:**
 
-        Returns:
-            tuple[eqx.Module, optax.OptState, float]: The updated stepper, the
-                updated optimizer state, and the loss value.
+        - `stepper`: The equinox module to be updated.
+        - `opt_state`: The current optimizer state.
+        - `data`: The data for the current minibatch.
+
+        **Returns:**
+
+        - The updated equinox module
+        - The updated optimizer state
+        - The loss value
         """
         loss, grad = eqx.filter_value_and_grad(
             lambda m: self.loss_configuration(
@@ -117,10 +135,15 @@ class GeneralTrainer(eqx.Module):
         *,
         return_loss_history: bool = True,
         record_loss_every: int = 1,
-    ):
+    ) -> Union[
+        tuple[eqx.Module, Float[Array, "num_minibatches"]],
+        eqx.Module,
+        tuple[eqx.Module, Float[Array, "num_minibatches"], list],
+        tuple[eqx.Module, list],
+    ]:
         """
-        Perform the entire training of an autoregressive neural emulator
-        `stepper`.
+        Perform the entire training of an autoregressive neural emulator given
+        in an initial state as `stepper`.
 
         This method spawns a `tqdm` progress meter showing the current update
         step and displaying the epoch with its respetive minibatch counter.
@@ -133,25 +156,27 @@ class GeneralTrainer(eqx.Module):
         values of the callback function at each minibatch. If no callback
         function is provided, this function has at max two return values. The
         first return value is the trained stepper, and the second return value
-        is the loss history.
+        is the loss history. If `return_loss_history` is set to `False`, the
+        loss history will not be returned.
 
-        Args:
-            stepper (eqx.Module): The stepper to be trained. key (PRNGKeyArray):
-            The random key to be used for shuffling the
-                minibatches.
-            return_loss_history (bool, optional): Whether to return the loss
-                history. Defaults to True.
-            record_loss_every (int, optional): Record the loss every
-                `record_loss_every` minibatches. Defaults to 1.
+        **Arguments:**
 
-        Returns:
-            Varying, see above.
+        - `stepper`: The equinox Module to be trained.
+        - `key`: The random key to be used for shuffling the minibatches.
+        - `return_loss_history`: Whether to return the loss history.
+        - `record_loss_every`: Record the loss every `record_loss_every`
+            minibatches. Defaults to 1, i.e., record every minibatch.
 
-        Tipp:
+        **Returns:**
+
+        - Varying, see above. It will always return the trained stepper as the
+            first return value.
+
+        !!! tip
             You can use `equinox.filter_vmap` to train mulitple networks (of the
-                same architecture) at the same time. For example, if your GPU
-                is not fully utilized yet, this will give you a init-seed
-                statistic basically for free.
+            same architecture) at the same time. For example, if your GPU is not
+            fully utilized yet, this will give you a init-seed statistic
+            basically for free.
         """
         loss_history = []
         if self.callback_fn is not None:
