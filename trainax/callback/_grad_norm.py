@@ -24,12 +24,29 @@ class GradNorm(BaseCallback):
         residuum_fn: eqx.Module = None,
         name: str,
     ):
-        self.every = every
+        """
+        Callback to save the gradient norm associated with `loss_configuration`
+        `every` update steps.
+
+        **Arguments:**
+
+        - `every`: The frequency of the callback.
+        - `loss_configuration`: The loss configuration to compute the gradient
+            norm. If the gradient norm associated with the training loss is
+            desired, the corresponding loss configuration has to be re-supplied.
+        - `squared`: Whether to return the squared gradient norm.
+        - `ref_stepper`: A reference stepper that is used to compute the residuum.
+            Supply this if the loss configuration requires a reference stepper.
+        - `residuum_fn`: A residuum function that computes the discrete residuum
+            between two consecutive states. Supply this if the loss configuration
+            requires a residuum function.
+        - `name`: The name of the callback.
+        """
         self.loss_configuration = loss_configuration
         self.squared = squared
         self.ref_stepper = ref_stepper
         self.residuum_fn = residuum_fn
-        self.name = name
+        super().__init__(every, name)
 
     def callback(
         self,
@@ -37,6 +54,7 @@ class GradNorm(BaseCallback):
         stepper: eqx.Module,
         data: PyTree,
     ) -> eqx.Module:
+        """Compute the gradient norm."""
         grad = eqx.filter_grad(self.loss_configuration)(
             stepper,
             data,

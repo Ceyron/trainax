@@ -17,10 +17,19 @@ class SaveNetwork(BaseCallback):
         file_name: str,
         name: str = "network_saved",
     ):
-        self.every = every
+        """
+        Callback to write the network state to a file `every` update step.
+
+        **Arguments:**
+
+        - `every`: The frequency of the callback.
+        - `path`: The path to save the network state.
+        - `file_name`: The file name to save the network state.
+        - `name`: The name of the callback
+        """
         self.path = path
         self.file_name = file_name
-        self.name = name
+        super().__init__(every, name)
 
     def callback(
         self,
