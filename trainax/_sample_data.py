@@ -134,7 +134,7 @@ def _lorenz_rhs(
 
 
 def make_lorenz_stepper_rk4(
-    dt: float = 0.05,
+    dt: float = 0.01,
     *,
     sigma: float = 10.0,
     rho: float = 28.0,
@@ -149,7 +149,7 @@ def lorenz_rk4(
     num_samples: int = 20,
     *,
     temporal_horizon: int = 1000,
-    dt: float = 0.05,
+    dt: float = 0.01,
     num_warmup_steps: int = 500,
     sigma: float = 10.0,
     rho: float = 28.0,
