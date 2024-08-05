@@ -133,11 +133,42 @@ def _lorenz_rhs(
     return jnp.array([x_dot, y_dot, z_dot])
 
 
+def make_lorenz_stepper_rk4(
+    dt: float = 0.01,
+    *,
+    sigma: float = 10.0,
+    rho: float = 28.0,
+    beta: float = 8.0 / 3.0,
+) -> Callable[[Float[Array, "3"]], Float[Array, "3"]]:
+    r"""
+    Produces a timestepper for the Lorenz system using a fixed-size Runge-Kutta
+    4th order scheme.
+
+    **Arguments**:
+
+    - `dt`: The timestep size. Depending on the values of `sigma`, `rho`, and
+        `beta`, the system might be hard to integrate. Usually, a time step
+        $\Delta t \in [0.01, 0.1]$ is a good choice. The default is `0.01` which
+        matches https://doi.org/10.1175/1520-0469(1963)020%3C0130:DNF%3E2.0.CO;2
+    - `sigma`: The $\sigma$ parameter of the Lorenz system. The default is `10.0`.
+    - `rho`: The $\rho$ parameter of the Lorenz system. The default is `28.0`.
+    - `beta`: The $\beta$ parameter of the Lorenz system. The default is `8.0/3.0`.
+
+    **Returns**:
+
+    - A function that takes a state vector of shape `(3,)` and returns the next
+        state vector of shape `(3,)`.
+    """
+    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+    return lorenz_stepper
+
+
 def lorenz_rk4(
     num_samples: int = 20,
     *,
     temporal_horizon: int = 1000,
-    dt: float = 0.05,
+    dt: float = 0.01,
     num_warmup_steps: int = 500,
     sigma: float = 10.0,
     rho: float = 28.0,
@@ -184,8 +215,10 @@ def lorenz_rk4(
 
     u_0_set = jax.random.normal(key, shape=(num_samples, 3)) * init_std
 
-    lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
-    lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+    # lorenz_rhs_params_fixed = lambda u: _lorenz_rhs(u, sigma=sigma, rho=rho, beta=beta)
+    # lorenz_stepper = lambda u: _step_rk4(lorenz_rhs_params_fixed, u, dt=dt)
+
+    lorenz_stepper = make_lorenz_stepper_rk4(dt=dt, sigma=sigma, rho=rho, beta=beta)
 
     def scan_fn(u, _):
         u_next = lorenz_stepper(u)
