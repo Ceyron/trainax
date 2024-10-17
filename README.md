@@ -30,7 +30,7 @@
 </p>
 
 <p align="center">
-    <img src="docs/imgs/sample_two_step_supervised.svg" width="400">
+    <img src="https://github.com/user-attachments/assets/99e054ea-cd79-4ba9-853a-9d74e26ce35e" width="400">
 </p>
 
 Convenience abstractions using `optax` to train neural networks to
