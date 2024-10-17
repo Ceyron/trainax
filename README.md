@@ -40,7 +40,7 @@ Train a kernel size 2 linear convolution (no bias) to become an emulator for the
 import jax
 import jax.numpy as jnp
 import equinox as eqx
-import optax
+import optax  # pip install optax
 import trainax as tx
 
 CFL = -0.75
