@@ -68,14 +68,14 @@ stencil come closer to the numerical FOU stencil.
 ## Features
 
 * Wide collection of unrolled training methodologies:
-  * Supervised
-  * Diverted Chain
-  * Mix Chain
-  * Residuum
+    * Supervised
+    * Diverted Chain
+    * Mix Chain
+    * Residuum
 * Based on [JAX](https://github.com/google/jax):
-  * One of the best Automatic Differentiation engines (forward & reverse)
-  * Automatic vectorization
-  * Backend-agnostic code (run on CPU, GPU, and TPU)
+    * One of the best Automatic Differentiation engines (forward & reverse)
+    * Automatic vectorization
+    * Backend-agnostic code (run on CPU, GPU, and TPU)
 * Build on top and compatible with [Equinox](https://github.com/patrick-kidger/equinox)
 * Batch-Parallel Training
 * Collection of Callbacks
