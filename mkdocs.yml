@@ -84,6 +84,7 @@ plugins:
 
 nav:
     - 'index.md'
+    - 'more_details.md'
     - Examples:
         - Introductory:
             - Lorenz Emulator: 'examples/lorenz_emulator.ipynb'
