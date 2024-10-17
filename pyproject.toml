@@ -1,6 +1,6 @@
 [project]
 name = "trainax"
-version = "0.0.1"
+version = "0.0.2"
 description = "Training methodologies for Autoregressive Neural Emulators in JAX built on top of Equinox & Optax."
 readme = "README.md"
 requires-python ="~=3.10"
