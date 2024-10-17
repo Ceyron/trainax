@@ -1,12 +1,23 @@
-<h1 align="center">
-  <img src="docs/imgs/trainax_logo.png" width="400">
-  <br>
-    Trainax
-  <br>
-</h1>
-
 <p align="center">
 <b>Learning Methodologies for Autoregressive Neural Emulators.</b>
+</p>
+
+<p align="center">
+<a href="https://pypi.org/project/trainax/">
+  <img src="https://img.shields.io/pypi/v/trainax.svg" alt="PyPI">
+</a>
+<a href="https://github.com/ceyron/trainax/actions/workflows/test.yml">
+  <img src="https://github.com/ceyron/trainax/actions/workflows/test.yml/badge.svg" alt="Tests">
+</a>
+<a href="https://fkoehler.site/trainax/">
+  <img src="https://img.shields.io/badge/docs-latest-green" alt="docs-latest">
+</a>
+<a href="https://github.com/ceyron/trainax/releases">
+  <img src="https://img.shields.io/github/v/release/ceyron/trainax?include_prereleases&label=changelog" alt="Changelog">
+</a>
+<a href="https://github.com/ceyron/trainax/blob/main/LICENSE.txt">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="License">
+</a>
 </p>
 
 <p align="center">
@@ -22,14 +33,23 @@
     <img src="docs/imgs/sample_two_step_supervised.svg" width="400">
 </p>
 
+Convenience abstractions using `optax` to train neural networks to
+autoregressively emulate time-dependent problems taking care of trajectory
+subsampling and offering a wide range of training methodologies (regarding
+unrolling length and including differentiable physics).
+
 ## Installation
 
 Clone the repository, navigate to the folder and install the package with pip:
 ```bash
-pip install .
+pip install trainax
 ```
 
 Requires Python 3.10+ and JAX 0.4.13+. 👉 [JAX install guide](https://jax.readthedocs.io/en/latest/installation.html).
+
+## Documentation
+
+The documentation is available at [fkoehler.site/trainax](https://fkoehler.site/trainax/).
 
 ## Quickstart
 
@@ -136,7 +156,7 @@ and modify the gradient flow, etc.
 * Composability
 
 
-## A Taxonomy of Training Methodologies
+<!-- ## A Taxonomy of Training Methodologies
 
 The major axes that need to be chosen are:
 
@@ -192,15 +212,25 @@ There are three levels of hierarchy:
    trajectory substacker.
 
 You can find an overview of predictor learning setups
-[here](https://fkoehler.site/predictor-learning-setups/).
+[here](https://fkoehler.site/predictor-learning-setups/). -->
 
-## License
+## Acknowledgements
 
-MIT, see [here](LICENSE.txt)
+### Citation
+
+This package was developed as part of the `APEBench paper` (accepted at Neurips 2024), we will soon add the citation here.
+
+### Funding
+
+The main author (Felix Koehler) is a PhD student in the group of [Prof. Thuerey at TUM](https://ge.in.tum.de/) and his research is funded by the [Munich Center for Machine Learning](https://mcml.ai/).
+
+### License
+
+MIT, see [here](https://github.com/Ceyron/trainax/blob/main/LICENSE.txt)
 
 ---
 
 > [fkoehler.site](https://fkoehler.site/) &nbsp;&middot;&nbsp;
 > GitHub [@ceyron](https://github.com/ceyron) &nbsp;&middot;&nbsp;
-> X [@felix_m_koehler](https://twitter.com/felix_m_koehler)
-
+> X [@felix_m_koehler](https://twitter.com/felix_m_koehler) &nbsp;&middot;&nbsp;
+> LinkedIn [Felix Köhler](www.linkedin.com/in/felix-koehler)
