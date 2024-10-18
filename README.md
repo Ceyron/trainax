@@ -40,7 +40,6 @@ unrolling length and including differentiable physics).
 
 ## Installation
 
-Clone the repository, navigate to the folder and install the package with pip:
 ```bash
 pip install trainax
 ```
