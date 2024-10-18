@@ -117,7 +117,7 @@ ways we can frame a learning problem to inject "knowledge" from $\mathcal{P}_h$
 into $f_\theta$.
 
 Assume we have a distribution of initial conditions $\mathcal{Q}$ from which we
-sample $S$ initial conditions, $u^{[0]} \propto \mathcal{Q}$. Then, we can save
+sample $S$ initial states, $u^{[0]} \propto \mathcal{Q}$. Then, we can save
 them in an array of shape $(S, C, *N)$ (with C channels and an arbitrary number
 of spatial axes of dimension N) and repeatedly apply $\mathcal{P}$ to obtain the
 training trajectory of shape $(S, T+1, C, *N)$.
