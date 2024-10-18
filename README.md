@@ -22,11 +22,11 @@
 
 <p align="center">
   <a href="#installation">Installation</a> •
+  <a href="#documentation">Documentation</a> •
   <a href="#quickstart">Quickstart</a> •
   <a href="#background">Background</a> •
   <a href="#features">Features</a> •
-  <a href="#a-taxonomy-of-training-methodologies">Taxonomy</a> •
-  <a href="#license">License</a>
+  <a href="#acknowledgements">Acknowledgements</a>
 </p>
 
 <p align="center">
