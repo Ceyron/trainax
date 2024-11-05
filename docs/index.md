@@ -81,9 +81,7 @@ stencil come closer to the numerical FOU stencil.
 * Collection of Callbacks
 * Composability
 
-## Acknowledgements
-
-### Citation
+## Citation
 
 This package was developed as part of the [APEBench paper
 (arxiv.org/abs/2411.00180)](https://arxiv.org/abs/2411.00180) (accepted at
@@ -105,11 +103,11 @@ it:
 [Here](https://github.com/tum-pbs/apebench) you can find the APEBench benchmark
 suite.
 
-### Funding
+## Funding
 
 The main author (Felix Koehler) is a PhD student in the group of [Prof. Thuerey at TUM](https://ge.in.tum.de/) and his research is funded by the [Munich Center for Machine Learning](https://mcml.ai/).
 
-### License
+## License
 
 MIT, see [here](https://github.com/Ceyron/trainax/blob/main/LICENSE.txt)
 
