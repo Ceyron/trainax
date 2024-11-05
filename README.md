@@ -26,7 +26,7 @@
   <a href="#quickstart">Quickstart</a> •
   <a href="#background">Background</a> •
   <a href="#features">Features</a> •
-  <a href="#acknowledgements">Acknowledgements</a>
+  <a href="#citation">Citation</a>
 </p>
 
 <p align="center">
@@ -213,17 +213,33 @@ There are three levels of hierarchy:
 You can find an overview of predictor learning setups
 [here](https://fkoehler.site/predictor-learning-setups/). -->
 
-## Acknowledgements
+## Citation
 
-### Citation
+This package was developed as part of the [APEBench paper
+(arxiv.org/abs/2411.00180)](https://arxiv.org/abs/2411.00180) (accepted at
+Neurips 2024). If you find it useful for your research, please consider citing
+it:
 
-This package was developed as part of the `APEBench paper` (accepted at Neurips 2024), we will soon add the citation here.
+```bibtex
+@article{koehler2024apebench,
+  title={{APEBench}: A Benchmark for Autoregressive Neural Emulators of {PDE}s},
+  author={Felix Koehler and Simon Niedermayr and R{\"}udiger Westermann and Nils Thuerey},
+  journal={Advances in Neural Information Processing Systems (NeurIPS)},
+  volume={38},
+  year={2024}
+}
+```
 
-### Funding
+(Feel free to also give the project a star on GitHub if you like it.)
+
+[Here](https://github.com/tum-pbs/apebench) you can find the APEBench benchmark
+suite.
+
+## Funding
 
 The main author (Felix Koehler) is a PhD student in the group of [Prof. Thuerey at TUM](https://ge.in.tum.de/) and his research is funded by the [Munich Center for Machine Learning](https://mcml.ai/).
 
-### License
+## License
 
 MIT, see [here](https://github.com/Ceyron/trainax/blob/main/LICENSE.txt)
 
